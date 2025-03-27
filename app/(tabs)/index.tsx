@@ -5,7 +5,6 @@ import * as Location from 'expo-location';
 import * as FaceDetector from 'expo-face-detector';
 import { useAuth } from '@/hooks/useAuth';
 import { TeacherDashboard } from '@/components/TeacherDashboard';
-import { StudentScanner } from '@/components/StudentScanner';
 import StudentDashboardScreen from '@/components/StudentDashboard';
 
 export default function HomeScreen() {
@@ -20,8 +19,7 @@ export default function HomeScreen() {
       ]);
 
       setHasPermissions(
-        cameraStatus.status === 'granted' && 
-        locationStatus.status === 'granted'
+        cameraStatus.status === 'granted' && locationStatus.status === 'granted'
       );
     })();
   }, []);
@@ -29,14 +27,20 @@ export default function HomeScreen() {
   if (!hasPermissions) {
     return (
       <View style={styles.container}>
-        <Text style={styles.text}>Please grant camera and location permissions</Text>
+        <Text style={styles.text}>
+          Please grant camera and location permissions
+        </Text>
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      {user?.role === 'teacher' ? <TeacherDashboard /> : <StudentDashboardScreen />}
+      {user?.role === 'teacher' ? (
+        <TeacherDashboard />
+      ) : (
+        <StudentDashboardScreen />
+      )}
     </View>
   );
 }

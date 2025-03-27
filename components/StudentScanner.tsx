@@ -17,11 +17,11 @@ export function StudentScanner() {
     try {
       // 1. Verify QR Code
       const qrData = JSON.parse(data);
-      
+
       // 2. Check Location
       const location = await Location.getCurrentPositionAsync({});
       const isLocationValid = verifyLocation(location, qrData.coordinates);
-      
+
       if (!isLocationValid) {
         Alert.alert('Error', 'You must be in the classroom to mark attendance');
         return;
@@ -29,7 +29,7 @@ export function StudentScanner() {
 
       // 3. Verify Face
       const faceVerified = await verifyFace(cameraRef);
-      
+
       if (!faceVerified) {
         Alert.alert('Error', 'Face verification failed');
         return;
@@ -64,9 +64,7 @@ export function StudentScanner() {
         }}
       >
         <View style={styles.overlay}>
-          <Text style={styles.scanText}>
-            Scan QR Code to Mark Attendance
-          </Text>
+          <Text style={styles.scanText}>Scan QR Code to Mark Attendance</Text>
         </View>
       </Camera>
     </View>

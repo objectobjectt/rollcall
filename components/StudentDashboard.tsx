@@ -1,5 +1,12 @@
 import { View, StyleSheet, ScrollView, Image } from 'react-native';
-import { Text, Card, Button, Surface, ProgressBar, Chip } from 'react-native-paper';
+import {
+  Text,
+  Card,
+  Button,
+  Surface,
+  ProgressBar,
+  Chip,
+} from 'react-native-paper';
 // import { RootState } from '@/store';
 import { router } from 'expo-router';
 import { Users, Clock, BookOpen } from 'lucide-react-native';
@@ -8,10 +15,10 @@ export default function StudentDashboardScreen() {
   const user = {
     name: 'John Doe',
     role: 'teacher',
-  }
+  };
 
   const handleScanQR = () => {
-    // router.push('/scan');
+    router.push('./StudentScanner');
   };
 
   if (user?.role !== 'teacher') {
@@ -21,7 +28,9 @@ export default function StudentDashboardScreen() {
           <Text variant="headlineMedium" style={styles.greeting}>
             Welcome back, {user?.name}!
           </Text>
-          <Text variant="bodyLarge" style={styles.role}>Student</Text>
+          <Text variant="bodyLarge" style={styles.role}>
+            Student
+          </Text>
         </View>
 
         <View style={styles.content}>
@@ -64,10 +73,15 @@ export default function StudentDashboardScreen() {
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.scrollContent}
+    >
       <Surface style={styles.headerCard} elevation={2}>
         <Image
-          source={{ uri: 'https://images.unsplash.com/photo-1544717297-fa95b6ee9643?w=800' }}
+          source={{
+            uri: 'https://images.unsplash.com/photo-1544717297-fa95b6ee9643?w=800',
+          }}
           style={styles.headerImage}
         />
         <View style={styles.headerOverlay}>
@@ -85,20 +99,32 @@ export default function StudentDashboardScreen() {
       <View style={styles.statsContainer}>
         <Surface style={styles.statCard} elevation={1}>
           <Users size={24} color="#6366F1" />
-          <Text variant="titleLarge" style={styles.statNumber}>156</Text>
-          <Text variant="bodyMedium" style={styles.statLabel}>Total Students</Text>
+          <Text variant="titleLarge" style={styles.statNumber}>
+            156
+          </Text>
+          <Text variant="bodyMedium" style={styles.statLabel}>
+            Total Students
+          </Text>
         </Surface>
 
         <Surface style={styles.statCard} elevation={1}>
           <Clock size={24} color="#EC4899" />
-          <Text variant="titleLarge" style={styles.statNumber}>24</Text>
-          <Text variant="bodyMedium" style={styles.statLabel}>Classes Today</Text>
+          <Text variant="titleLarge" style={styles.statNumber}>
+            24
+          </Text>
+          <Text variant="bodyMedium" style={styles.statLabel}>
+            Classes Today
+          </Text>
         </Surface>
 
         <Surface style={styles.statCard} elevation={1}>
           <BookOpen size={24} color="#14B8A6" />
-          <Text variant="titleLarge" style={styles.statNumber}>89%</Text>
-          <Text variant="bodyMedium" style={styles.statLabel}>Attendance Rate</Text>
+          <Text variant="titleLarge" style={styles.statNumber}>
+            89%
+          </Text>
+          <Text variant="bodyMedium" style={styles.statLabel}>
+            Attendance Rate
+          </Text>
         </Surface>
       </View>
 
@@ -113,8 +139,8 @@ export default function StudentDashboardScreen() {
                 Advanced Mathematics - Class 12A
               </Text>
             </View>
-            <Chip 
-              mode="outlined" 
+            <Chip
+              mode="outlined"
               style={styles.activeChip}
               textStyle={styles.activeChipText}
             >
@@ -125,9 +151,15 @@ export default function StudentDashboardScreen() {
           <View style={styles.attendanceProgress}>
             <View style={styles.progressHeader}>
               <Text variant="bodyMedium">Students Present</Text>
-              <Text variant="bodyMedium" style={styles.progressText}>28/35</Text>
+              <Text variant="bodyMedium" style={styles.progressText}>
+                28/35
+              </Text>
             </View>
-            <ProgressBar progress={0.8} color="#6366F1" style={styles.progressBar} />
+            <ProgressBar
+              progress={0.8}
+              color="#6366F1"
+              style={styles.progressBar}
+            />
           </View>
 
           <Button
@@ -144,17 +176,39 @@ export default function StudentDashboardScreen() {
 
       <Card style={styles.scheduleCard}>
         <Card.Content>
-          <Text variant="titleMedium" style={styles.scheduleTitle}>Today's Schedule</Text>
-          
+          <Text variant="titleMedium" style={styles.scheduleTitle}>
+            Today's Schedule
+          </Text>
+
           {[
-            { time: '09:00 AM', class: 'Class 12-A', subject: 'Advanced Mathematics', room: 'Room 301', status: 'completed' },
-            { time: '11:00 AM', class: 'Class 11-B', subject: 'Basic Calculus', room: 'Room 205', status: 'active' },
-            { time: '02:00 PM', class: 'Class 10-C', subject: 'Algebra', room: 'Room 103', status: 'upcoming' },
+            {
+              time: '09:00 AM',
+              class: 'Class 12-A',
+              subject: 'Advanced Mathematics',
+              room: 'Room 301',
+              status: 'completed',
+            },
+            {
+              time: '11:00 AM',
+              class: 'Class 11-B',
+              subject: 'Basic Calculus',
+              room: 'Room 205',
+              status: 'active',
+            },
+            {
+              time: '02:00 PM',
+              class: 'Class 10-C',
+              subject: 'Algebra',
+              room: 'Room 103',
+              status: 'upcoming',
+            },
           ].map((session, index) => (
             <Surface key={index} style={styles.scheduleItem} elevation={1}>
               <View style={styles.scheduleTime}>
-                <Text variant="titleMedium" style={styles.timeText}>{session.time}</Text>
-                <Chip 
+                <Text variant="titleMedium" style={styles.timeText}>
+                  {session.time}
+                </Text>
+                <Chip
                   mode="flat"
                   style={[
                     styles.statusChip,
@@ -164,13 +218,20 @@ export default function StudentDashboardScreen() {
                   ]}
                   textStyle={styles.statusChipText}
                 >
-                  {session.status.charAt(0).toUpperCase() + session.status.slice(1)}
+                  {session.status.charAt(0).toUpperCase() +
+                    session.status.slice(1)}
                 </Chip>
               </View>
               <View style={styles.scheduleDetails}>
-                <Text variant="bodyLarge" style={styles.className}>{session.class}</Text>
-                <Text variant="bodyMedium" style={styles.subjectText}>{session.subject}</Text>
-                <Text variant="bodySmall" style={styles.roomText}>{session.room}</Text>
+                <Text variant="bodyLarge" style={styles.className}>
+                  {session.class}
+                </Text>
+                <Text variant="bodyMedium" style={styles.subjectText}>
+                  {session.subject}
+                </Text>
+                <Text variant="bodySmall" style={styles.roomText}>
+                  {session.room}
+                </Text>
               </View>
             </Surface>
           ))}
