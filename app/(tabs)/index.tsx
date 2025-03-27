@@ -6,6 +6,7 @@ import * as FaceDetector from 'expo-face-detector';
 import { useAuth } from '@/hooks/useAuth';
 import { TeacherDashboard } from '@/components/TeacherDashboard';
 import { StudentScanner } from '@/components/StudentScanner';
+import StudentDashboardScreen from '@/components/StudentDashboard';
 
 export default function HomeScreen() {
   const { user } = useAuth();
@@ -35,7 +36,7 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      {user?.role === 'teacher' ? <TeacherDashboard /> : <StudentScanner />}
+      {user?.role === 'teacher' ? <TeacherDashboard /> : <StudentDashboardScreen />}
     </View>
   );
 }
