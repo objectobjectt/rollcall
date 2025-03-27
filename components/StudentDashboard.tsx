@@ -10,15 +10,17 @@ import {
 // import { RootState } from '@/store';
 import { router } from 'expo-router';
 import { Users, Clock, BookOpen } from 'lucide-react-native';
+import StudentScanner from '@/app/(tabs)/StudentScanner';
 
 export default function StudentDashboardScreen() {
   const user = {
-    name: 'John Doe',
+    name: 'Aditya Bavadekar',
     role: 'teacher',
   };
 
   const handleScanQR = () => {
-    router.push('./StudentScanner');
+    console.log('Qr scanner');
+    // return <StudentScanner />;
   };
 
   if (user?.role !== 'teacher') {

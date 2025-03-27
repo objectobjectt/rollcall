@@ -6,6 +6,7 @@ import * as FaceDetector from 'expo-face-detector';
 import { useAuth } from '@/hooks/useAuth';
 import { TeacherDashboard } from '@/components/TeacherDashboard';
 import StudentDashboardScreen from '@/components/StudentDashboard';
+import StudentScanner from '@/app/(tabs)/StudentScanner';
 
 export default function HomeScreen() {
   const { user } = useAuth();
