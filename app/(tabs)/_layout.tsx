@@ -4,8 +4,6 @@ import {
   QrCode,
   History,
   Settings,
-  Scan,
-  LayoutDashboard,
 } from 'lucide-react-native';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -18,20 +16,13 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Dashboard',
+          title: isTeacher ? 'Dashboard' : 'Scan',
           tabBarIcon: ({ color, size }) =>
             isTeacher ? (
               <UserCircle2 size={size} color={color} />
             ) : (
-              <LayoutDashboard size={size} color={color} />
+              <QrCode size={size} color={color} />
             ),
-        }}
-      />
-      <Tabs.Screen
-        name="StudentScanner"
-        options={{
-          title: 'Scan',
-          tabBarIcon: ({ color, size }) => <Scan size={size} color={color} />,
         }}
       />
       <Tabs.Screen
