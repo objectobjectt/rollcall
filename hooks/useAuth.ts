@@ -15,7 +15,7 @@ export function useAuth() {
     setUser({
       id: '1',
       name: 'John Doe',
-      role: 'teacher',
+      role: 'student',
     });
     setLoading(false);
   }, []);
