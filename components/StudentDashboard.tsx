@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, StyleSheet, ScrollView, Image, Dimensions, TouchableOpacity } from 'react-native';
 import {
   Text,
@@ -12,10 +12,12 @@ import { router } from 'expo-router';
 import { Users, Clock, BookOpen, Calendar, AlertCircle } from 'lucide-react-native';
 import { useAuth } from '@/hooks/useAuth';
 
-const { width } = Dimensions.get('window');
-
 export default function StudentDashboardScreen() {
   const { user, signOut } = useAuth();
+
+  // useEffect(() => {
+    console.log('user', user);
+  // }, []);
 
   const renderStudentDashboard = () => (
     <View style={styles.container}>

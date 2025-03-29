@@ -9,7 +9,6 @@ import MyProfile from '@/app/(screens)/profile';
 import HomeTrainer from '@/app/(screens)/trainer/homeTrainer';
 import CoursePage from '@/app/(screens)/admin/course';
 import AddCoords from '@/app/(screens)/admin/addCoords';
-import AdminProfile from '@/app/(screens)/admin/profile';
 import { Book, Feather } from 'lucide-react-native';
 import HistoryScreen from '@/app/(screens)/trainer/history';
 import QRgenerator from '@/app/(screens)/trainer/generateQR';
@@ -49,7 +48,7 @@ export const AdminTabNavigator = () => (
     />
     <LearnerTab.Screen
       name="Profile"
-      component={AdminProfile}
+      component={MyProfile}
       options={{
         headerShown: false,
         tabBarIcon: ({ color, size }) => (

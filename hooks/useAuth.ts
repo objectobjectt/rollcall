@@ -20,9 +20,19 @@ export function useAuth() {
         let token = await AsyncStorage.getItem('user');
         if (token) {
           const parsedToken = JSON.parse(token);
-          const userdata = await Api.get(Api.GET_INFO(parsedToken.role));
+          let userdata: any = await AsyncStorage.getItem('user.info');
+          if (userdata) {
+            userdata = JSON.parse(userdata);
+            setUser(userdata);
+          } else {
+            userdata = await Api.get(Api.GET_INFO(parsedToken.role));
+            await AsyncStorage.setItem(
+              'user.info',
+              JSON.stringify(userdata.responseJson.info)
+            );
+            setUser(userdata.responseJson.info);
+          }
           console.log(userdata);
-          setUser(userdata.responseJson);
           router.push('/(tabs)');
         } else {
           setUser(null);
