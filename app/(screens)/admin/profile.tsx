@@ -1,10 +1,16 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React from 'react';
+import { useAuth } from '@/hooks/useAuth';
 
-const AdminProfile: React.FC = () => {
+const AdminProfile = () => {
+  const { signOut } = useAuth();
   return (
     <View style={styles.container}>
       <Text style={styles.heading}>Admin Profile</Text>
       <Text style={styles.paragraph}>Welcome to the admin profile page.</Text>
+      <TouchableOpacity onPress={() => signOut()}>
+      <Text style={styles.paragraph}>Logout</Text>
+      </TouchableOpacity>
     </View>
   );
 };
