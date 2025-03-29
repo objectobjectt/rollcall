@@ -9,7 +9,7 @@
     "lint": "expo lint"
   },
   "dependencies": {
-    "@expo/vector-icons": "^14.0.2",
+    "@expo/vector-icons": "^14.0.4",
     "@lucide/lab": "^0.1.2",
     "@react-native-async-storage/async-storage": "1.23.1",
     "@react-native-community/geolocation": "^3.4.0",
@@ -22,6 +22,7 @@
     "expo-camera": "~16.0.18",
     "expo-constants": "^17.0.5",
     "expo-crypto": "~14.0.2",
+    "expo-dev-client": "~5.0.15",
     "expo-face-detector": "~13.0.2",
     "expo-font": "^13.0.3",
     "expo-haptics": "^14.0.1",
@@ -43,7 +44,6 @@
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-native": "0.76.7",
-    "react-native-ble-manager": "^12.1.4",
     "react-native-ble-plx": "^3.5.0",
     "react-native-bluetooth-classic": "^1.60.0-rc.30",
     "react-native-gesture-handler": "~2.20.2",
@@ -57,8 +57,7 @@
     "react-native-url-polyfill": "^2.0.0",
     "react-native-web": "^0.19.13",
     "react-native-webview": "13.12.5",
-    "react-redux": "^9.1.0",
-    "expo-dev-client": "~5.0.15"
+    "react-redux": "^9.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

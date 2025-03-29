@@ -1,42 +1,77 @@
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import { router, useRouter } from 'expo-router';
 import { useRouteNode } from 'expo-router/build/Route';
-import { useState } from 'react';
+import react, { useState, useEffect } from 'react';
 import {
-  Button,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
   Alert,
 } from 'react-native';
+import { Camera } from 'expo-camera';
+import * as Location from 'expo-location';
+import { MaterialIcons } from '@expo/vector-icons';
+import { Button, Card } from 'react-native-paper';
+
+const PermissionScreen = ({ onRequestPermissions }) => {
+  return (
+    <View style={{
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: '#f8f9fa',
+      padding: 20
+    }}>
+      <Card style={{ padding: 20, width: '90%', alignItems: 'center' }}>
+        <MaterialIcons name="security" size={40} color="#6200ea" />
+        <Text style={{ fontSize: 18, fontWeight: 'bold', marginVertical: 10, textAlign: 'center' }}>
+          Permission Required
+        </Text>
+        <Text style={{ fontSize: 14, color: '#555', textAlign: 'center', marginBottom: 20 }}>
+          Please grant camera and location permissions to continue.
+        </Text>
+        <Button mode="contained" onPress={onRequestPermissions}>
+          Grant Permissions
+        </Button>
+      </Card>
+    </View>
+  );
+};
 
 export default function StudentScanner() {
+    const [hasPermissions, setHasPermissions] = useState(false);
+ 
+    const onRequestPermissions = async () => {
+        const [cameraStatus, locationStatus] = await Promise.all([
+          Camera.requestCameraPermissionsAsync(),
+          Location.requestForegroundPermissionsAsync(),
+        ]);
+  
+        setHasPermissions(
+          cameraStatus.status === 'granted' && locationStatus.status === 'granted'
+        );
+        console.log("Camera Status: ", cameraStatus.status);
+        console.log("Location Status: ", locationStatus.status);
+        
+    };
+
+    useEffect(() => {
+      onRequestPermissions();
+    }, []);
+  
+    if (!hasPermissions) {
+      return <PermissionScreen onRequestPermissions={onRequestPermissions} />;
+    }
+
+    return <StudentScannerIntenal />
+  }
+
+function StudentScannerIntenal() {
   const [facing, setFacing] = useState<CameraType>('back');
-  const [permission, requestPermission] = useCameraPermissions();
   const [scanned, setScanned] = useState(false);
   const router = useRouter();
-  if (!permission) {
-    return <View />;
-  }
-
-  if (!permission.granted) {
-    return (
-      <View style={styles.container}>
-        <View style={styles.permissionCard}>
-          <Text style={styles.permissionText}>
-            We need your permission to use the camera
-          </Text>
-          <Button
-            onPress={requestPermission}
-            title="Grant Permission"
-            color="#3498db"
-          />
-        </View>
-      </View>
-    );
-  }
-
+  
   function toggleCameraFacing() {
     setFacing((current) => (current === 'back' ? 'front' : 'back'));
   }

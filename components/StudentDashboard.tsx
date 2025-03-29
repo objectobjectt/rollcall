@@ -13,7 +13,6 @@ import { Users, Clock, BookOpen, Calendar, AlertCircle } from 'lucide-react-nati
 import { useAuth } from '@/hooks/useAuth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-
 export default function StudentDashboardScreen() {
   const [user, setUser]: any = useState(null);
   const [loading, setLoading] = useState(true);
@@ -33,6 +32,10 @@ export default function StudentDashboardScreen() {
   }, []);
 
 
+
+  // useEffect(() => {
+  console.log('user', user);
+  // }, []);
 
   const renderStudentDashboard = () => (
     <View style={styles.container}>
