@@ -6,16 +6,15 @@ import { ArrowLeft, Check, AlertCircle } from 'lucide-react-native';
 import Svg, { Circle, Path, G } from 'react-native-svg';
 
 const FaceDetectionScreen = () => {
+  const router = useRouter()
   const [permission, requestPermission] = useCameraPermissions();
   const [detectionStatus, setDetectionStatus] = useState('waiting'); // 'waiting', 'processing', 'success', 'failed'
   const [detectionMessage, setDetectionMessage] = useState('Position your face in the frame');
   
-  // Animation values
   const rotateAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const fadeAnim = useRef(new Animated.Value(0.7)).current;
   useEffect(() => {
-    // Start the rotation animation
     Animated.loop(
       Animated.timing(rotateAnim, {
         toValue: 1,
@@ -57,17 +56,16 @@ const FaceDetectionScreen = () => {
       ])
     ).start();
 
-    // Simulate a face detection process after 5 seconds
+    //face detection process after 5 seconds
     const detectionTimer = setTimeout(() => {
       setDetectionStatus('processing');
       setDetectionMessage('Analyzing face...');
       
-      // After 3 seconds, set to success
+      // After 3 seconds, success
       setTimeout(() => {
         setDetectionStatus('success');
         setDetectionMessage('Face detected successfully!');
         
-        // Navigate back after 2 seconds
         setTimeout(() => {
           router.back();
         }, 2000);
@@ -79,14 +77,12 @@ const FaceDetectionScreen = () => {
     };
   }, []);
 
-  // Request camera permissions if not granted
   useEffect(() => {
     if (!permission?.granted) {
       requestPermission();
     }
   }, [permission, requestPermission]);
 
-  // Create interpolated animations
   const rotation = rotateAnim.interpolate({
     inputRange: [0, 1],
     outputRange: ['0deg', '360deg'],

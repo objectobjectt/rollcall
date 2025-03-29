@@ -52,7 +52,7 @@ export const AttendanceMarkScreen = () => {
   const handleVerificationStep = (step) => {
     // For face detection, navigate to the specified path
     if (step === 'faceDetected') {
-      router.push('/FaceDectection');
+      router.push('/FaceDetection');
     } else {
       // For demo purposes, simulate the verification success for other steps
       if (verificationSteps[step] !== 'success') {
