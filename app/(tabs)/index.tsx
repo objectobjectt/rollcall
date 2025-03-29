@@ -1,11 +1,11 @@
 import { StyleSheet, Text, View } from 'react-native';
 import React, { useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Home = () => {
-  const { getUserInfo, user } = useAuth();
   const userInfo = async () => {
-    const user = await getUserInfo();
+    const user = await AsyncStorage.getItem('user');
     console.log(user);
   };
 
