@@ -50,28 +50,16 @@ export const AttendanceMarkScreen = () => {
   }, [verificationSteps]);
 
   const handleVerificationStep = (step) => {
-    // First navigate to the specific verification screen
-    const routes = {
-      faceDetected: "",
-    };
-    
-    // Navigate to the specific verification screen
-    if (routes[step]) {
-      router.push({
-        pathname: routes[step],
-        params: { 
-          returnTo: 'attendance-mark',
-          className: classInfo.className 
-        }
-      });
-    }
-    
-    // For demo purposes, also simulate the verification success
-    // In a real app, this would happen when returning from the verification screen
-    if (verificationSteps[step] !== 'success') {
-      setTimeout(() => {
-        setVerificationSteps(prev => ({ ...prev, [step]: 'success' }));
-      }, 1500);
+    // For face detection, navigate to the specified path
+    if (step === 'faceDetected') {
+      router.push('/FaceDectection');
+    } else {
+      // For demo purposes, simulate the verification success for other steps
+      if (verificationSteps[step] !== 'success') {
+        setTimeout(() => {
+          setVerificationSteps(prev => ({ ...prev, [step]: 'success' }));
+        }, 1500);
+      }
     }
   };
 
@@ -89,7 +77,7 @@ export const AttendanceMarkScreen = () => {
 
   const handleDone = () => {
     // Navigate back to the home screen
-    router.push('/(screens)/face-detection');
+    router.push('../(tabs)/index');
   };
 
   const renderVerificationIcon = (status) => {
