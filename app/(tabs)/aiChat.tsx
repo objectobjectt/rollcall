@@ -229,41 +229,41 @@ export default function Chat() {
     setShowApiKeyInput(false);
   };
 
-  if (showApiKeyInput) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <StatusBar barStyle="light-content" backgroundColor="#4a69bd" />
-        <LinearGradient
-          colors={['#4a69bd', '#6a89cc']}
-          style={styles.apiKeyContainer}
-        >
-          <View style={styles.apiKeyForm}>
-            <Text style={styles.title}>Welcome to AI Chatbot</Text>
-            <Text style={styles.subtitle}>
-              Please enter your Groq API key to continue
-            </Text>
-            <TextInput
-              style={styles.apiKeyInput}
-              placeholder="Enter your Groq API key"
-              placeholderTextColor="#a4b0be"
-              value={apiKey}
-              onChangeText={setApiKey}
-              secureTextEntry
-            />
-            <TouchableOpacity
-              style={styles.saveButton}
-              onPress={() => saveKeyAndCloseSettings(apiKey)}
-            >
-              <Text style={styles.saveButtonText}>Continue</Text>
-            </TouchableOpacity>
-            <Text style={styles.apiKeyHelp}>
-              You can get your API key from the Groq website.
-            </Text>
-          </View>
-        </LinearGradient>
-      </SafeAreaView>
-    );
-  }
+  // if (showApiKeyInput) {
+  //   return (
+  //     <SafeAreaView style={styles.container}>
+  //       <StatusBar barStyle="light-content" backgroundColor="#4a69bd" />
+  //       <LinearGradient
+  //         colors={['#4a69bd', '#6a89cc']}
+  //         style={styles.apiKeyContainer}
+  //       >
+  //         <View style={styles.apiKeyForm}>
+  //           <Text style={styles.title}>Welcome to AI Chatbot</Text>
+  //           <Text style={styles.subtitle}>
+  //             Please enter your Groq API key to continue
+  //           </Text>
+  //           <TextInput
+  //             style={styles.apiKeyInput}
+  //             placeholder="Enter your Groq API key"
+  //             placeholderTextColor="#a4b0be"
+  //             value={apiKey}
+  //             onChangeText={setApiKey}
+  //             secureTextEntry
+  //           />
+  //           <TouchableOpacity
+  //             style={styles.saveButton}
+  //             onPress={() => saveKeyAndCloseSettings(apiKey)}
+  //           >
+  //             <Text style={styles.saveButtonText}>Continue</Text>
+  //           </TouchableOpacity>
+  //           <Text style={styles.apiKeyHelp}>
+  //             You can get your API key from the Groq website.
+  //           </Text>
+  //         </View>
+  //       </LinearGradient>
+  //     </SafeAreaView>
+  //   );
+  // }
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -340,32 +340,34 @@ export default function Chat() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f6fa',
+    backgroundColor: '#EBF5FB', // Soft light blue background
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 16,
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
+    borderBottomLeftRadius: 25,
+    borderBottomRightRadius: 25,
+    backgroundColor: '#2980B9', // Deep blue header
+    elevation: 6,
+    shadowColor: '#1A5276',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
   },
   headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#fff',
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    letterSpacing: 0.5,
   },
   headerButtons: {
     flexDirection: 'row',
   },
   iconButton: {
-    padding: 8,
-    marginLeft: 8,
+    padding: 10,
+    marginLeft: 10,
   },
   messageList: {
     flex: 1,
@@ -376,155 +378,96 @@ const styles = StyleSheet.create({
   },
   messageContainer: {
     flexDirection: 'row',
-    marginVertical: 6,
+    marginVertical: 8,
     alignItems: 'flex-end',
   },
   userMessageContainer: {
     justifyContent: 'flex-end',
   },
   avatarContainer: {
-    marginRight: 8,
+    marginRight: 10,
   },
   avatar: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#3498DB', // Bright blue avatar
   },
   avatarText: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontWeight: 'bold',
-    fontSize: 14,
+    fontSize: 16,
   },
   messageBubble: {
-    padding: 14,
-    borderRadius: 20,
-    maxWidth: '75%',
+    padding: 15,
+    borderRadius: 22,
+    maxWidth: '80%',
   },
   userBubble: {
-    backgroundColor: '#4a69bd',
+    backgroundColor: '#2980B9', // Deep blue for user messages
     alignSelf: 'flex-end',
-    borderBottomRightRadius: 6,
+    borderBottomRightRadius: 8,
     marginLeft: 'auto',
   },
   aiBubble: {
-    backgroundColor: '#fff',
-    borderBottomLeftRadius: 6,
-    shadowColor: '#dcdde1',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 2,
+    backgroundColor: '#FFFFFF',
+    borderBottomLeftRadius: 8,
+    borderColor: '#AED6F1',
+    borderWidth: 1,
+    shadowColor: '#5DADE2',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 3,
+    elevation: 3,
   },
   messageText: {
     fontSize: 16,
-    lineHeight: 22,
+    lineHeight: 24,
   },
   userText: {
-    color: '#fff',
+    color: '#FFFFFF',
   },
   aiText: {
-    color: '#2f3640',
+    color: '#2C3E50', // Dark blue-gray text
   },
   timestampText: {
     fontSize: 10,
-    color: '#a4b0be',
+    color: '#85C1E9', // Light blue timestamp
     alignSelf: 'flex-end',
     marginTop: 4,
   },
   inputContainer: {
     flexDirection: 'row',
     padding: 12,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
     borderTopWidth: 1,
-    borderTopColor: '#e9eaed',
+    borderTopColor: '#AED6F1',
   },
   input: {
     flex: 1,
-    backgroundColor: '#f5f6fa',
+    backgroundColor: '#EBF5FB', // Light blue input background
     padding: 14,
-    borderRadius: 24,
+    borderRadius: 25,
     fontSize: 16,
     maxHeight: 120,
-    color: '#2f3640',
-    shadowColor: '#dcdde1',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 1,
+    color: '#2C3E50',
+    borderWidth: 1,
+    borderColor: '#5DADE2',
   },
   sendButton: {
-    backgroundColor: '#4a69bd',
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    backgroundColor: '#2980B9', // Deep blue send button
+    width: 50,
+    height: 50,
+    borderRadius: 25,
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: 10,
-    shadowColor: '#4a69bd',
+    elevation: 4,
+    shadowColor: '#1A5276',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 3,
-    elevation: 3,
-  },
-  apiKeyContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  apiKeyForm: {
-    width: '90%',
-    backgroundColor: '#fff',
-    borderRadius: 20,
-    padding: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#2f3640',
-    marginBottom: 10,
-    textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#7f8fa6',
-    textAlign: 'center',
-    marginBottom: 24,
-  },
-  apiKeyInput: {
-    width: '100%',
-    backgroundColor: '#f5f6fa',
-    padding: 16,
-    borderRadius: 12,
-    fontSize: 16,
-    borderWidth: 1,
-    borderColor: '#dcdde1',
-    marginBottom: 20,
-    color: '#2f3640',
-  },
-  saveButton: {
-    backgroundColor: '#4a69bd',
-    padding: 16,
-    borderRadius: 12,
-    width: '100%',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  saveButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  apiKeyHelp: {
-    fontSize: 14,
-    color: '#7f8fa6',
-    textAlign: 'center',
+    shadowOpacity: 0.25,
+    shadowRadius: 3.5,
   },
 });
