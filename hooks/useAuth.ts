@@ -26,19 +26,21 @@ export function useAuth() {
     await AsyncStorage.setItem('token', JSON.stringify(token));
     setUser(token);
     console.log('User', user);
-    return token;
+    if (user?.role === 'learner') router.push('/(tabs)/learner');
+    else if (user?.role === 'trainer') router.push('/(tabs)/trainer');
+    else if (user?.role === 'admin') router.push('/(tabs)/admin/');
   };
 
   const getUserInfo = async () => {
     // try {
-    //   const token = await AsyncStorage.getItem('token');
+    //   const token = await AsyncStorage.removeItem('token');
     //   console.log(token);
     //   setUser(token);
     //   console.log('User', user);
     //   if (user == null) {
     //     router.push('/(auth)/Login');
     //   } else {
-    //     router.push('/(tabs)');
+    //     router.push('/(tabs)/');
     //   }
     // } catch (err: any) {
     //   await AsyncStorage.removeItem('token');
@@ -52,5 +54,6 @@ export function useAuth() {
     signOut: () => {},
     signIn,
     getUserInfo,
+    setUser,
   };
 }

@@ -1,53 +1,40 @@
-import { Tabs } from 'expo-router';
-import {
-  CircleUser as UserCircle2,
-  QrCode,
-  History,
-  Settings,
-  Scan,
-} from 'lucide-react-native';
+import { useEffect, useState } from 'react';
+import { Stack } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 import { useAuth } from '@/hooks/useAuth';
+import LearnerNavigator from '@/navigators/learnerNavigator';
+import TrainerNavigator from '@/navigators/trainerNavigator';
+import AdminNavigator from '@/navigators/adminNavigator';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function TabLayout() {
-  const { user } = useAuth();
-  const isTeacher = user?.role === 'teacher';
+export default function RoleLayout() {
+  useFrameworkReady();
+  const { getUserInfo } = useAuth();
+  const [user, setUser] = useState(null);
+  const userInfo = async () => {
+    let tuser = await AsyncStorage.getItem('token');
+    tuser = JSON.parse(tuser);
+
+    setUser(tuser);
+  };
+
+  useEffect(() => {
+    userInfo();
+  }, []);
 
   return (
-    <Tabs screenOptions={{ headerShown: false }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Dashboard',
-          tabBarIcon: ({ color, size }) => (
-            <UserCircle2 size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="StudentScanner"
-        options={{
-          title: 'Scan',
-          tabBarIcon: ({ color, size }) => <Scan size={size} color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="history"
-        options={{
-          title: 'History',
-          tabBarIcon: ({ color, size }) => (
-            <History size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="settings"
-        options={{
-          title: 'Settings',
-          tabBarIcon: ({ color, size }) => (
-            <Settings size={size} color={color} />
-          ),
-        }}
-      />
-    </Tabs>
+    <>
+      {user?.role === 'learner' ? (
+        <LearnerNavigator />
+      ) : user?.role === 'trainer' ? (
+        <TrainerNavigator />
+      ) : user?.role === 'admin' ? (
+        <AdminNavigator />
+      ) : (
+        <LearnerNavigator />
+      )}
+      <StatusBar style="auto" />
+    </>
   );
 }
