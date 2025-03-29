@@ -1,25 +1,59 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Ionicons } from '@expo/vector-icons';
-import HomeAdmin from '@/app/(screens)/homeAdmin';
-import HomeTrainer from '@/app/(screens)/homeTrainer';
+import { AntDesign, Entypo, EvilIcons, Ionicons } from '@expo/vector-icons';
+import HomeAdmin from '@/app/(screens)/admin/homeAdmin';
 import HomeScreen from '@/app/(screens)/homeLearner';
+<<<<<<< HEAD
 import StudentScanner from '@/app/(screens)/StudentScanner';
 import { View } from 'lucide-react-native';
 import { Text } from 'react-native';
 import MyProfile from '@/app/(screens)/profile';
+=======
+import HomeTrainer from '@/app/(screens)/homeTrainer';
+import CoursePage from '@/app/(screens)/admin/course';
+import AddCoords from '@/app/(screens)/admin/addCoords';
+import AdminProfile from '@/app/(screens)/admin/profile';
+import { Book, Feather } from 'lucide-react-native';
+>>>>>>> refs/remotes/origin/main
 
 const AdminTab = createBottomTabNavigator();
 const TrainerTab = createBottomTabNavigator();
 const LearnerTab = createBottomTabNavigator();
 
 export const AdminTabNavigator = () => (
-  <AdminTab.Navigator>
+  <AdminTab.Navigator screenOptions={{ headerShown: false }}>
     <AdminTab.Screen
       name="Dashboard"
       component={HomeAdmin}
       options={{
         tabBarIcon: ({ color, size }) => (
-          <Ionicons name="home" size={size} color={color} />
+          <Ionicons name="home-outline" size={size} color={color} />
+        ),
+      }}
+    />
+    <AdminTab.Screen
+      name="Courses"
+      component={CoursePage}
+      options={{
+        tabBarIcon: ({ color, size }) => (
+          <AntDesign name="book" size={size} color={color} />
+        ),
+      }}
+    />
+    <AdminTab.Screen
+      name="Add Coordinates"
+      component={AddCoords}
+      options={{
+        tabBarIcon: ({ color, size }) => (
+          <Entypo name="location" size={size} color={color} />
+        ),
+      }}
+    />
+    <AdminTab.Screen
+      name="Profile"
+      component={AdminProfile}
+      options={{
+        tabBarIcon: ({ color, size }) => (
+          <EvilIcons name="user" size={size} color={color} />
         ),
       }}
     />
@@ -37,7 +71,7 @@ export const AdminTabNavigator = () => (
 );
 
 export const TrainerTabNavigator = () => (
-  <TrainerTab.Navigator>
+  <TrainerTab.Navigator screenOptions={{ headerShown: false }}>
     <TrainerTab.Screen
       name="Home"
       component={HomeTrainer}
@@ -61,7 +95,7 @@ export const TrainerTabNavigator = () => (
 );
 
 export const LearnerTabNavigator = () => (
-  <LearnerTab.Navigator>
+  <LearnerTab.Navigator screenOptions={{ headerShown: false }}>
     <LearnerTab.Screen
       name="Home"
       component={HomeScreen}
