@@ -2,18 +2,15 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { AntDesign, Entypo, EvilIcons, Ionicons } from '@expo/vector-icons';
 import HomeAdmin from '@/app/(screens)/admin/homeAdmin';
 import HomeScreen from '@/app/(screens)/homeLearner';
-<<<<<<< HEAD
 import StudentScanner from '@/app/(screens)/StudentScanner';
 import { View } from 'lucide-react-native';
 import { Text } from 'react-native';
 import MyProfile from '@/app/(screens)/profile';
-=======
 import HomeTrainer from '@/app/(screens)/homeTrainer';
 import CoursePage from '@/app/(screens)/admin/course';
 import AddCoords from '@/app/(screens)/admin/addCoords';
 import AdminProfile from '@/app/(screens)/admin/profile';
 import { Book, Feather } from 'lucide-react-native';
->>>>>>> refs/remotes/origin/main
 
 const AdminTab = createBottomTabNavigator();
 const TrainerTab = createBottomTabNavigator();
@@ -48,18 +45,9 @@ export const AdminTabNavigator = () => (
         ),
       }}
     />
-    <AdminTab.Screen
-      name="Profile"
-      component={AdminProfile}
-      options={{
-        tabBarIcon: ({ color, size }) => (
-          <EvilIcons name="user" size={size} color={color} />
-        ),
-      }}
-    />
     <LearnerTab.Screen
       name="Profile"
-      component={MyProfile}
+      component={AdminProfile}
       options={{
         headerShown: false,
         tabBarIcon: ({ color, size }) => (
