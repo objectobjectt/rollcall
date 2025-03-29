@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, ScrollView, Image, Dimensions, TouchableOpacity } from 'react-native';
 import {
   Text,
@@ -11,23 +11,38 @@ import {
 import { router } from 'expo-router';
 import { Users, Clock, BookOpen, Calendar, AlertCircle } from 'lucide-react-native';
 import { useAuth } from '@/hooks/useAuth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function StudentDashboardScreen() {
-  const { user, signOut } = useAuth();
+  const [user, setUser]: any = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // useEffect(() => {
-    console.log('user', user);
-  // }, []);
+  useEffect(() => {
+    async function checkToken() {
+      const token = await AsyncStorage.getItem('user.info');
+      if (!token) {
+
+      } else {
+        const parsedToken = JSON.parse(token);
+        setUser(parsedToken);
+        console.log("pttt", parsedToken);
+        setLoading(false);
+      }
+    }
+    checkToken();
+  }, []);
+
+
 
   const renderStudentDashboard = () => (
     <View style={styles.container}>
       <View style={styles.header}>
         <View style={styles.headerContent}>
           <View>
-            <TouchableOpacity onPress={() => signOut()}>
-            <Text variant="headlineMedium" style={styles.greeting}>
-              Welcome back, {user?.name}!
-            </Text>
+            <TouchableOpacity >
+              <Text variant="headlineMedium" style={styles.greeting}>
+                Welcome back, {user.name}!
+              </Text>
             </TouchableOpacity>
             <Text variant="bodyLarge" style={styles.role}>
               Student Dashboard
