@@ -59,13 +59,13 @@ export function useAuth() {
       }
     } catch (error) {
       console.error('Error signing in:', error);
-      // Handle sign-in error
     }
   };
 
   const signOut = async () => {
     try {
-      await AsyncStorage.removeItem('user'); // Fixed: was 'token' instead of 'user'
+      await AsyncStorage.removeItem('user');
+      await AsyncStorage.removeItem('user.info');
       setUser(null);
       router.push('/(auth)/Login');
     } catch (error) {
