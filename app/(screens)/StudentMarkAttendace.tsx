@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, ActivityIndicator } from 'react-native';
 import { Check, X, Clock, MapPin, Bluetooth, Camera, Shield } from 'lucide-react-native';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import * as Location from 'expo-location';
+// import { BleManager } from 'react-native-ble-plx';
+
+// const bleManager = new BleManager();
 
 const classInfo = {
   className: 'Computer Science 3A',
@@ -12,13 +16,25 @@ const classInfo = {
 
 export const AttendanceMarkScreen = () => {
   const router = useRouter();
-  
+  const { qrData } = useLocalSearchParams();
+
+  if (!qrData) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Text style={styles.errorTitle}>Invalid QR Code</Text>
+        <Text style={styles.errorSubtitle}>Please scan a valid QR code</Text>
+        <TouchableOpacity style={styles.retryButton} onPress={() => router.back()}>
+          <Text style={styles.retryButtonText}>Go Back</Text>
+        </TouchableOpacity>
+      </SafeAreaView>
+    );
+  }
+
   const [verificationSteps, setVerificationSteps] = useState({
     qrScanned: 'success', // Already completed since page is pushed after QR scan
-    locationVerified: 'pending',
-    bluetoothVerified: 'pending',
+    locationVerified: 'processing',
     faceDetected: 'pending',
-    livenessChecked: 'pending'
+    bluetoothVerified: 'processing',
   });
 
   const [attendanceStatus, setAttendanceStatus] = useState('in_progress');
@@ -49,27 +65,78 @@ export const AttendanceMarkScreen = () => {
     }
   }, [verificationSteps]);
 
-  const handleVerificationStep = (step) => {
-    // For face detection, navigate to the specified path
-    if (step === 'faceDetected') {
-      router.push('/FaceDetection');
-    } else {
-      // For demo purposes, simulate the verification success for other steps
-      if (verificationSteps[step] !== 'success') {
+  const handleVerificationStep = (step: string) => {
+    switch (step) {
+      case 'locationVerified':
+        setVerificationSteps(prev => ({ ...prev, [step]: 'processing' }));
         setTimeout(() => {
           setVerificationSteps(prev => ({ ...prev, [step]: 'success' }));
-        }, 1500);
-      }
+        }, 2000);
+        break;
+
+      case 'bluetoothVerified':
+        setVerificationSteps(prev => ({ ...prev, [step]: 'processing' }));
+        setTimeout(() => {
+          setVerificationSteps(prev => ({ ...prev, [step]: 'success' }));
+        }, 2000);
+        break;
+
+      case 'faceDetected':
+        setVerificationSteps(prev => ({ ...prev, [step]: 'success' }));
+        break;
+
+      default:
+        if (verificationSteps[step] !== 'success') {
+          setTimeout(() => {
+            setVerificationSteps(prev => ({ ...prev, [step]: 'success' }));
+          }, 1500);
+        }
+
     }
   };
 
+
+  /*
+{"coords": {"accuracy": 16.399999618530273, "altitude": 591.3999633789062, "altitudeAccuracy": 1.4045461416244507, "heading": 0, "latitude": 18.4644745, "longitude": 73.8685867, "speed": 0}, "mocked": false, "timestamp": 1743278443479}
+  */
+
+  useEffect(() => {
+    // Capture location
+    Location.getCurrentPositionAsync({
+      accuracy: Location.Accuracy.Highest,
+    })
+      .then((location) => {
+        console.log(location);
+        setVerificationSteps(prev => ({ ...prev, locationVerified: 'success' }));
+        router.push({
+          pathname: '/FaceDetection',
+        });
+        setVerificationSteps(prev => ({ ...prev, faceDetected: 'success' }));
+      })
+      .catch((error) => {
+        console.error(error);
+        setVerificationSteps(prev => ({ ...prev, locationVerified: 'error' }));
+      });
+
+    // Capture nearby bluetooth devices
+    // bleManager.startDeviceScan(null, null, (error, device) => {
+    //   if (error) {
+    //     console.log(error);
+    //     return;
+    //   }
+    //   if (!device) return;
+    //   console.log('Found device:', device.name);
+    // });
+
+    // Capture face
+  }, []);
+
   const handleRetry = () => {
     setVerificationSteps({
-      qrScanned: 'success', // Keep QR as success
+      qrScanned: 'success',
       locationVerified: 'pending',
       bluetoothVerified: 'pending',
       faceDetected: 'pending',
-      livenessChecked: 'pending'
     });
     setAttendanceStatus('in_progress');
     setQrTimer(120);
@@ -80,7 +147,7 @@ export const AttendanceMarkScreen = () => {
     router.push('/(tabs)');
   };
 
-  const renderVerificationIcon = (status) => {
+  const renderVerificationIcon = (status:string) => {
     switch (status) {
       case 'pending':
         return <Clock color="#FFA500" size={24} />;
@@ -93,7 +160,7 @@ export const AttendanceMarkScreen = () => {
     }
   };
 
-  const getStepIcon = (step) => {
+  const getStepIcon = (step: string) => {
     switch (step) {
       case 'qrScanned':
         return <Camera color="#555" size={20} />;
@@ -134,8 +201,8 @@ export const AttendanceMarkScreen = () => {
         <TouchableOpacity style={styles.retryButton} onPress={handleRetry}>
           <Text style={styles.retryButtonText}>Retry</Text>
         </TouchableOpacity>
-        <TouchableOpacity 
-          style={styles.homeButton} 
+        <TouchableOpacity
+          style={styles.homeButton}
           onPress={() => router.push('/')}
         >
           <Text style={styles.homeButtonText}>Go to Home</Text>
@@ -145,7 +212,7 @@ export const AttendanceMarkScreen = () => {
   }
 
   // Format step name for display
-  const formatStepName = (step) => {
+  const formatStepName = (step: string) => {
     return step
       .replace(/([A-Z])/g, ' $1')
       .replace(/^./, str => str.toUpperCase())
@@ -167,17 +234,17 @@ export const AttendanceMarkScreen = () => {
       </View>
 
       <View style={styles.qrTimerContainer}>
-        <Text style={[styles.qrTimerText, qrTimer < 30 && {color: '#FF0000'}]}>
+        <Text style={[styles.qrTimerText, qrTimer < 30 && { color: '#FF0000' }]}>
           QR Valid For: {Math.floor(qrTimer / 60)}:{(qrTimer % 60).toString().padStart(2, '0')}
         </Text>
       </View>
 
       <View style={styles.verificationContainer}>
         {Object.entries(verificationSteps).map(([step, status]) => (
-          <View 
+          <View
             key={step}
             style={[
-              styles.verificationStep, 
+              styles.verificationStep,
               status === 'success' && styles.verificationStepComplete
             ]}
           >
@@ -187,9 +254,9 @@ export const AttendanceMarkScreen = () => {
               </View>
               <Text style={styles.verificationStepText}>{formatStepName(step)}</Text>
             </View>
-            
+
             {step !== 'qrScanned' && status !== 'success' ? (
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.verifyButton}
                 onPress={() => handleVerificationStep(step)}
                 disabled={status === 'processing'}
@@ -205,7 +272,7 @@ export const AttendanceMarkScreen = () => {
           </View>
         ))}
       </View>
-      
+
       <Text style={styles.instructionText}>
         Please complete all verification steps to mark attendance
       </Text>

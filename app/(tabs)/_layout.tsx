@@ -51,9 +51,9 @@ export default function RoleLayout() {
           case 'trainer':
             return <TrainerTabNavigator />;
           default:
-            return <View />;
+            return <ActivityIndicator />;
         }
       })()}
     </View>
-  )
+  );
 }

@@ -10,7 +10,7 @@ const FaceDetectionScreen = () => {
   const [permission, requestPermission] = useCameraPermissions();
   const [detectionStatus, setDetectionStatus] = useState('waiting'); // 'waiting', 'processing', 'success', 'failed'
   const [detectionMessage, setDetectionMessage] = useState('Position your face in the frame');
-  
+
   const rotateAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const fadeAnim = useRef(new Animated.Value(0.7)).current;
@@ -60,14 +60,14 @@ const FaceDetectionScreen = () => {
     const detectionTimer = setTimeout(() => {
       setDetectionStatus('processing');
       setDetectionMessage('Analyzing face...');
-      
+
       // After 3 seconds, success
       setTimeout(() => {
         setDetectionStatus('success');
         setDetectionMessage('Face detected successfully!');
-        
+
         setTimeout(() => {
-          router.back();
+          router.back()
         }, 2000);
       }, 3000);
     }, 5000);
@@ -101,13 +101,13 @@ const FaceDetectionScreen = () => {
 
   return (
     <View style={styles.container}>
-      <CameraView 
-        style={styles.camera} 
+      <CameraView
+        style={styles.camera}
         facing="front"
       >
         <SafeAreaView style={styles.overlay}>
           <View style={styles.header}>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.backButton}
               onPress={() => router.back()}
             >
@@ -118,7 +118,7 @@ const FaceDetectionScreen = () => {
 
           {/* Face oval guide */}
           <View style={styles.faceGuideContainer}>
-            <Animated.View 
+            <Animated.View
               style={[
                 styles.faceGuide,
                 {
@@ -168,7 +168,7 @@ const FaceDetectionScreen = () => {
         </SafeAreaView>
       </CameraView>
     </View>
-    
+
   );
 
 };
@@ -178,17 +178,17 @@ const FaceAnimationSvg = () => (
   <Svg height="120" width="120" viewBox="0 0 100 100">
     {/* Face outline */}
     <Circle cx="50" cy="50" r="30" stroke="#FFFFFF" strokeWidth="2" fill="none" />
-    
+
     {/* Eyes */}
     <Circle cx="40" cy="45" r="4" fill="#FFFFFF" />
     <Circle cx="60" cy="45" r="4" fill="#FFFFFF" />
-    
+
     {/* Nose */}
     <Path d="M50,50 L50,60 M45,58 L50,60 L55,58" stroke="#FFFFFF" strokeWidth="2" fill="none" />
-    
+
     {/* Mouth */}
     <Path d="M40,65 Q50,70 60,65" stroke="#FFFFFF" strokeWidth="2" fill="none" />
-    
+
     {/* Animated guide arrows */}
     <G opacity="0.8">
       <Path d="M18,50 L10,50 L15,45 M10,50 L15,55" stroke="#FFFFFF" strokeWidth="2" />
