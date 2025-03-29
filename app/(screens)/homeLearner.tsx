@@ -6,7 +6,7 @@ import { useAuth } from '@/hooks/useAuth';
 import StudentDashboardScreen from '@/components/StudentDashboard';
 
 export default function HomeScreen() {
-  const { user, getUserInfo } = useAuth();
+  const { user } = useAuth();
   const [hasPermissions, setHasPermissions] = useState(false);
 
   useEffect(() => {
@@ -20,14 +20,6 @@ export default function HomeScreen() {
         cameraStatus.status === 'granted' && locationStatus.status === 'granted'
       );
     })();
-  }, []);
-
-  const userInfo = async () => {
-    await getUserInfo();
-  };
-
-  useEffect(() => {
-    userInfo();
   }, []);
 
   if (!hasPermissions) {

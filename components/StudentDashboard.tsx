@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, ScrollView, Image, Dimensions } from 'react-native';
+import { View, StyleSheet, ScrollView, Image, Dimensions, TouchableOpacity } from 'react-native';
 import {
   Text,
   Card,
@@ -10,23 +10,23 @@ import {
 } from 'react-native-paper';
 import { router } from 'expo-router';
 import { Users, Clock, BookOpen, Calendar, AlertCircle } from 'lucide-react-native';
+import { useAuth } from '@/hooks/useAuth';
 
 const { width } = Dimensions.get('window');
 
 export default function StudentDashboardScreen() {
-  const user = {
-    name: 'Aditya Bavadekar',
-    role: 'student',
-  };
+  const { user, signOut } = useAuth();
 
   const renderStudentDashboard = () => (
     <View style={styles.container}>
       <View style={styles.header}>
         <View style={styles.headerContent}>
           <View>
+            <TouchableOpacity onPress={() => signOut()}>
             <Text variant="headlineMedium" style={styles.greeting}>
               Welcome back, {user?.name}!
             </Text>
+            </TouchableOpacity>
             <Text variant="bodyLarge" style={styles.role}>
               Student Dashboard
             </Text>
@@ -37,7 +37,7 @@ export default function StudentDashboardScreen() {
         </View>
       </View>
 
-      <ScrollView 
+      <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >

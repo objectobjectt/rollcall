@@ -9,48 +9,48 @@ interface User {
 }
 
 export function useAuth() {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const fetchUser = async () => {
+    const token = await AsyncStorage.getItem('token');
+    if (token) {
+      setUser(JSON.parse(token) as User);
+    }else{
+      setUser(null);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchUser();
+  }, []);
   const router = useRouter();
 
-  const signIn = async (email, password, role) => {
+  const signIn = async (email: string, password: string, role: string) => {
     const token = {
       id: Math.random().toString(),
       name: email,
+      email: email,
       role: role,
       password: password,
     };
-
-    console.log('Token', token);
-
     await AsyncStorage.setItem('token', JSON.stringify(token));
-    setUser(token);
-    console.log('User', user);
+    setUser(token as User);
+    router.push('/(tabs)');
   };
 
-  const getUserInfo = async () => {
-    // try {
-    //   const token = await AsyncStorage.removeItem('token');
-    //   console.log(token);
-    //   setUser(token);
-    //   console.log('User', user);
-    //   if (user == null) {
-    //     router.push('/(auth)/Login');
-    //   } else {
-    //     router.push('/(tabs)/');
-    //   }
-    // } catch (err: any) {
-    //   await AsyncStorage.removeItem('token');
-    //   return null;
-    // }
+  const signOut = async () => {
+    await AsyncStorage.removeItem('token');
+    setUser(null);
+    router.push('/(auth)/Login');
   };
 
   return {
     user,
     loading,
-    signOut: () => {},
+    signOut,
     signIn,
-    getUserInfo,
     setUser,
   };
 }
