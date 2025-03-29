@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 interface User {
   id: string;
   name: string;
-  role: 'teacher' | 'student';
+  role: 'admin' | 'trainer' | 'learner';
 }
 
 export function useAuth() {
@@ -26,9 +26,6 @@ export function useAuth() {
     await AsyncStorage.setItem('token', JSON.stringify(token));
     setUser(token);
     console.log('User', user);
-    if (user?.role === 'learner') router.push('/(tabs)/learner');
-    else if (user?.role === 'trainer') router.push('/(tabs)/trainer');
-    else if (user?.role === 'admin') router.push('/(tabs)/admin/');
   };
 
   const getUserInfo = async () => {
