@@ -11,7 +11,6 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-// Define types for our data structures
 type Badge = {
   id: string;
   name: string;
@@ -39,7 +38,6 @@ type Course = {
 };
 
 const AdminCoursePage: React.FC = () => {
-  // Sample data (in a real app, this would come from an API)
   const [badges] = useState<Badge[]>([
     { id: '1', name: 'JavaScript' },
     { id: '2', name: 'React' },
@@ -80,7 +78,6 @@ const AdminCoursePage: React.FC = () => {
     },
   ]);
 
-  // State for new course form
   const [newCourse, setNewCourse] = useState<{
     title: string;
     description: string;
@@ -91,13 +88,11 @@ const AdminCoursePage: React.FC = () => {
     requiredBadges: [],
   });
 
-  // State for modals
   const [showAddCourseModal, setShowAddCourseModal] = useState(false);
   const [showAddTrainerModal, setShowAddTrainerModal] = useState(false);
   const [showAddLearnerModal, setShowAddLearnerModal] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
 
-  // Helper functions
   const addNewCourse = () => {
     if (newCourse.title.trim() === '') return;
 
@@ -116,7 +111,6 @@ const AdminCoursePage: React.FC = () => {
   };
 
   const addTrainerToCourse = (trainer: Trainer, course: Course) => {
-    // Only add if trainer has the required expertise
     const hasRequiredExpertise = course.requiredBadges.some((requiredBadge) =>
       trainer.expertise.some((expertise) => expertise.id === requiredBadge.id)
     );
@@ -136,7 +130,6 @@ const AdminCoursePage: React.FC = () => {
   };
 
   const addLearnerToCourse = (learner: Learner, course: Course) => {
-    // Check if learner already has required badges
     const hasRequiredBadges = course.requiredBadges.every((requiredBadge) =>
       learner.badges.some((badge) => badge.id === requiredBadge.id)
     );
@@ -170,7 +163,6 @@ const AdminCoursePage: React.FC = () => {
     }
   };
 
-  // Render components
   const renderCourseItem = ({ item }: { item: Course }) => (
     <View style={styles.courseCard}>
       <Text style={styles.courseTitle}>{item.title}</Text>
@@ -253,7 +245,6 @@ const AdminCoursePage: React.FC = () => {
           contentContainerStyle={styles.courseList}
         />
 
-        {/* Add Course Modal */}
         <Modal
           visible={showAddCourseModal}
           animationType="slide"
@@ -330,7 +321,6 @@ const AdminCoursePage: React.FC = () => {
           </View>
         </Modal>
 
-        {/* Add Trainer Modal */}
         <Modal
           visible={showAddTrainerModal}
           animationType="slide"
@@ -388,7 +378,6 @@ const AdminCoursePage: React.FC = () => {
           </View>
         </Modal>
 
-        {/* Add Learner Modal */}
         <Modal
           visible={showAddLearnerModal}
           animationType="slide"
@@ -474,7 +463,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   title: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#333',
   },
