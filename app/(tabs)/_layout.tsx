@@ -19,6 +19,6 @@ export default function RoleLayout() {
   } else if (user?.role === 'admin') {
     return <AdminTabNavigator />;
   } else {
-    return <TrainerTabNavigator />;
+    return <AdminTabNavigator />;
   }
 }
