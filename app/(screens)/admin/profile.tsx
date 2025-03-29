@@ -1,10 +1,10 @@
 import React from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import ProfileScreen from '@/components/Profile';
+import MyProfile from '../profile';
 
 const AdminProfile = () => {
   const { signOut } = useAuth();
-  return <ProfileScreen />;
+  return <MyProfile />;
 };
 
 export default AdminProfile;

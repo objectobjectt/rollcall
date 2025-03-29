@@ -16,7 +16,7 @@ export function useAuth() {
     const token = await AsyncStorage.getItem('token');
     if (token) {
       setUser(JSON.parse(token) as User);
-    }else{
+    } else {
       setUser(null);
     }
     setLoading(false);
@@ -41,6 +41,7 @@ export function useAuth() {
   };
 
   const signOut = async () => {
+    console.log('Requesting sign out');
     await AsyncStorage.removeItem('token');
     setUser(null);
     router.push('/(auth)/Login');
