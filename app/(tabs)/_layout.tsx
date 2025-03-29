@@ -9,6 +9,7 @@ import {
   TrainerTabNavigator,
 } from '@/navigator/navigation';
 import { Text, View } from 'react-native';
+import { ActivityIndicator } from 'react-native-paper';
 
 export default function RoleLayout() {
   useFrameworkReady();
@@ -41,9 +42,9 @@ export default function RoleLayout() {
           case 'trainer':
             return <TrainerTabNavigator />;
           default:
-            return <View />;
+            return <ActivityIndicator />;
         }
       })()}
     </View>
-  )
+  );
 }
