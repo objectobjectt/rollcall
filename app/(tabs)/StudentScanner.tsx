@@ -1,4 +1,6 @@
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
+import { router, useRouter } from 'expo-router';
+import { useRouteNode } from 'expo-router/build/Route';
 import { useState } from 'react';
 import {
   Button,
@@ -13,7 +15,7 @@ export default function StudentScanner() {
   const [facing, setFacing] = useState<CameraType>('back');
   const [permission, requestPermission] = useCameraPermissions();
   const [scanned, setScanned] = useState(false);
-
+  const router = useRouter();
   if (!permission) {
     return <View />;
   }
@@ -47,7 +49,10 @@ export default function StudentScanner() {
         'QR Code Scanned', 
         data, 
         [
-          { text: 'OK', onPress: () => setScanned(false) },
+          { text: 'OK', onPress: () => {
+            setScanned(false)
+            router.push('/(screens)/StudentMarkAttendaceV2')
+          } },
         ],
         { cancelable: false }
       );
