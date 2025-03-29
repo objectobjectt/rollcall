@@ -1,10 +1,17 @@
 import { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { TextInput, Button, Text, HelperText, SegmentedButtons } from 'react-native-paper';
-import { Link, router } from 'expo-router';
+import {
+  TextInput,
+  Button,
+  Text,
+  HelperText,
+  SegmentedButtons,
+} from 'react-native-paper';
+import { Link, router, useRouter } from 'expo-router';
+import { useAuth } from '@/hooks/useAuth';
 // import { AuthService } from '@/services/auth';
 
-type Role = 'student' | 'teacher';
+type Role = 'learner' | 'trainer' | 'admin';
 
 // export default function RegisterScreen() {
 //   const [name, setName] = useState('');
@@ -24,10 +31,10 @@ type Role = 'student' | 'teacher';
 
 //       setLoading(true);
 //       setError(null);
-      
+
 //       // Simulate registration delay
 //       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
 //       router.replace('/login');
 //     } catch (err) {
 //       setError(err instanceof Error ? err.message : 'An error occurred');
@@ -162,24 +169,26 @@ type Role = 'student' | 'teacher';
 // });
 
 export default function LoginScreen() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('abc@example.com');
+  const [password, setPassword] = useState('abc');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [role, setRole] = useState<Role>('student');
+  const [role, setRole] = useState<Role>('learner');
+  const { signIn } = useAuth();
+  const router = useRouter();
 
-//   const dispatch = useDispatch();
-//   const authService = AuthService.getInstance();
+  //   const dispatch = useDispatch();
+  //   const authService = AuthService.getInstance();
 
   const handleLogin = async () => {
     try {
       setLoading(true);
       setError(null);
-      
-    //   const response = await authService.login({ email, password });
-      
-    //   dispatch(setUser(response.user));
-    //   router.replace('/(app)');
+
+      console.log(email, password, role);
+      await signIn(email, password, role);
+
+      router.push('/(tabs)');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -190,20 +199,25 @@ export default function LoginScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text variant="displaySmall" style={styles.title}>Welcome Back</Text>
-        <Text variant="bodyLarge" style={styles.subtitle}>Sign in to continue</Text>
+        <Text variant="displaySmall" style={styles.title}>
+          Welcome Back
+        </Text>
+        <Text variant="bodyLarge" style={styles.subtitle}>
+          Sign in to continue
+        </Text>
       </View>
 
       <SegmentedButtons
-          value={role}
-          onValueChange={(value:Role) => setRole(value as Role)}
-          buttons={[
-            { value: 'student', label: 'Student' },
-            { value: 'teacher', label: 'Teacher' },
-          ]}
-          style={styles.roleSelector}
-        />
-      
+        value={role}
+        onValueChange={(value: Role) => setRole(value as Role)}
+        buttons={[
+          { value: 'learner', label: 'Learner' },
+          { value: 'trainer', label: 'Trainer' },
+          { value: 'admin', label: 'Admin' },
+        ]}
+        style={styles.roleSelector}
+      />
+
       <View style={styles.form}>
         <TextInput
           label="Email"
@@ -216,7 +230,7 @@ export default function LoginScreen() {
           disabled={loading}
           error={!!error}
         />
-        
+
         <TextInput
           label="Password"
           value={password}
@@ -233,7 +247,7 @@ export default function LoginScreen() {
             {error}
           </HelperText>
         )}
-        
+
         <Button
           mode="contained"
           onPress={handleLogin}
@@ -244,9 +258,9 @@ export default function LoginScreen() {
           Sign In
         </Button>
 
-        <View style={styles.links}>          
+        <View style={styles.links}>
           {/* <Link href="/forgot-password" asChild> */}
-            <Button mode="text">Forgot Password?</Button>
+          <Button mode="text">Forgot Password?</Button>
           {/* </Link> */}
         </View>
       </View>

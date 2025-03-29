@@ -9,7 +9,7 @@ import StudentDashboardScreen from '@/components/StudentDashboard';
 import StudentScanner from '@/app/(tabs)/StudentScanner';
 
 export default function HomeScreen() {
-  const { user } = useAuth();
+  const { user, getUserInfo } = useAuth();
   const [hasPermissions, setHasPermissions] = useState(false);
 
   useEffect(() => {
@@ -23,6 +23,14 @@ export default function HomeScreen() {
         cameraStatus.status === 'granted' && locationStatus.status === 'granted'
       );
     })();
+  }, []);
+
+  const userInfo = async () => {
+    await getUserInfo();
+  };
+
+  useEffect(() => {
+    userInfo();
   }, []);
 
   if (!hasPermissions) {
