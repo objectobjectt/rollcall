@@ -16,6 +16,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function StudentDashboardScreen() {
   const [user, setUser]: any = useState(null);
   const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     async function checkToken() {
       const token = await AsyncStorage.getItem('user.info');
@@ -24,7 +25,7 @@ export default function StudentDashboardScreen() {
       } else {
         const parsedToken = JSON.parse(token);
         setUser(parsedToken);
-        console.log(parsedToken);
+        console.log("pttt", parsedToken);
         setLoading(false);
       }
     }
@@ -33,18 +34,14 @@ export default function StudentDashboardScreen() {
 
 
 
-  // useEffect(() => {
-  console.log('user', user);
-  // }, []);
-
   const renderStudentDashboard = () => (
     <View style={styles.container}>
       <View style={styles.header}>
         <View style={styles.headerContent}>
           <View>
-            <TouchableOpacity onPress={() => signOut()}>
+            <TouchableOpacity >
               <Text variant="headlineMedium" style={styles.greeting}>
-                Welcome back, {user?.name}!
+                Welcome back, {user.name}!
               </Text>
             </TouchableOpacity>
             <Text variant="bodyLarge" style={styles.role}>

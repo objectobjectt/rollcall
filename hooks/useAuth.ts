@@ -14,36 +14,37 @@ export function useAuth() {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        let token = await AsyncStorage.getItem('user');
-        if (token) {
-          const parsedToken = JSON.parse(token);
-          let userdata: any = await AsyncStorage.getItem('user.info');
-          if (userdata) {
-            userdata = JSON.parse(userdata);
-            setUser(userdata);
-          } else {
-            userdata = await Api.get(Api.GET_INFO(parsedToken.role));
-            await AsyncStorage.setItem(
-              'user.info',
-              JSON.stringify(userdata.responseJson.info)
-            );
-            setUser(userdata.responseJson.info);
-          }
-          console.log(userdata);
-          router.push('/(tabs)');
+  const fetchUser = async () => {
+    try {
+      let token = await AsyncStorage.getItem('user');
+      if (token) {
+        const parsedToken = JSON.parse(token);
+        let userdata: any = await AsyncStorage.getItem('user.info');
+        if (userdata) {
+          userdata = JSON.parse(userdata);
+          setUser(userdata);
         } else {
-          setUser(null);
+          userdata = await Api.get(Api.GET_INFO(parsedToken.role));
+          await AsyncStorage.setItem(
+            'user.info',
+            JSON.stringify(userdata.responseJson.info)
+          );
+          setUser(userdata.responseJson.info);
         }
-      } catch (error) {
-        console.error('Error fetching user:', error);
-      } finally {
-        setLoading(false);
+        console.log(userdata);
+        router.push('/(tabs)');
+      } else {
+        setUser(null);
       }
-    };
+    } catch (error) {
+      console.error('Error fetching user:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+
+  useEffect(() => {
     console.log('Auth effect running');
     fetchUser();
   }, []); // Empty dependency array means this runs once on mount
@@ -54,6 +55,7 @@ export function useAuth() {
       const token = data.responseJson.token;
       if (token) {
         await AsyncStorage.setItem('user', JSON.stringify({ token, role }));
+        fetchUser()
         setUser(token as User);
         router.push('/(tabs)');
       }
