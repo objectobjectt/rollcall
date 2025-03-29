@@ -1,3 +1,4 @@
+import { Api } from '@/constants/ApiConstants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { useState, useEffect } from 'react';
@@ -11,40 +12,55 @@ interface User {
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-
-  const fetchUser = async () => {
-    const token = await AsyncStorage.getItem('token');
-    if (token) {
-      setUser(JSON.parse(token) as User);
-    } else {
-      setUser(null);
-    }
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    fetchUser();
-  }, []);
   const router = useRouter();
 
-  const signIn = async (email: string, password: string, role: string) => {
-    const token = {
-      id: Math.random().toString(),
-      name: email,
-      email: email,
-      role: role,
-      password: password,
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        let token = await AsyncStorage.getItem('user');
+        if (token) {
+          const parsedToken = JSON.parse(token);
+          const userdata = await Api.get(Api.GET_INFO(parsedToken.role));
+          console.log(userdata);
+          setUser(userdata.responseJson);
+          router.push('/(tabs)');
+        } else {
+          setUser(null);
+        }
+      } catch (error) {
+        console.error('Error fetching user:', error);
+      } finally {
+        setLoading(false);
+      }
     };
-    await AsyncStorage.setItem('token', JSON.stringify(token));
-    setUser(token as User);
-    router.push('/(tabs)');
+
+    console.log('Auth effect running');
+    fetchUser();
+  }, []); // Empty dependency array means this runs once on mount
+
+  const signIn = async (email: string, password: string, role: string) => {
+    try {
+      const data = await Api.post(Api.GET_LOGIN_URL(role), { email, password });
+      const token = data.responseJson.token;
+      if (token) {
+        await AsyncStorage.setItem('user', JSON.stringify({ token, role }));
+        setUser(token as User);
+        router.push('/(tabs)');
+      }
+    } catch (error) {
+      console.error('Error signing in:', error);
+      // Handle sign-in error
+    }
   };
 
   const signOut = async () => {
-    console.log('Requesting sign out');
-    await AsyncStorage.removeItem('token');
-    setUser(null);
-    router.push('/(auth)/Login');
+    try {
+      await AsyncStorage.removeItem('user'); // Fixed: was 'token' instead of 'user'
+      setUser(null);
+      router.push('/(auth)/Login');
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
   };
 
   return {

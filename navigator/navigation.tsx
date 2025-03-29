@@ -6,13 +6,13 @@ import StudentScanner from '@/app/(screens)/StudentScanner';
 import { View } from 'lucide-react-native';
 import { Text } from 'react-native';
 import MyProfile from '@/app/(screens)/profile';
-import HomeTrainer from '@/app/(screens)/homeTrainer';
+import HomeTrainer from '@/app/(screens)/trainer/homeTrainer';
 import CoursePage from '@/app/(screens)/admin/course';
 import AddCoords from '@/app/(screens)/admin/addCoords';
 import AdminProfile from '@/app/(screens)/admin/profile';
 import { Book, Feather } from 'lucide-react-native';
-import HistoryScreen from '@/app/(screens)/history';
-import QRgenerator from '@/app/(screens)/generateQR';
+import HistoryScreen from '@/app/(screens)/trainer/history';
+import QRgenerator from '@/app/(screens)/trainer/generateQR';
 
 const AdminTab = createBottomTabNavigator();
 const TrainerTab = createBottomTabNavigator();

@@ -27,10 +27,10 @@ export default function StudentScanner() {
           <Text style={styles.permissionText}>
             We need your permission to use the camera
           </Text>
-          <Button 
-            onPress={requestPermission} 
-            title="Grant Permission" 
-            color="#3498db" 
+          <Button
+            onPress={requestPermission}
+            title="Grant Permission"
+            color="#3498db"
           />
         </View>
       </View>
@@ -45,17 +45,20 @@ export default function StudentScanner() {
     if (!scanned) {
       setScanned(true);
       // Process the scanned data
-      Alert.alert(
-        'QR Code Scanned', 
-        data, 
-        [
-          { text: 'OK', onPress: () => {
-            setScanned(false)
-            router.push('/(screens)/StudentMarkAttendaceV2')
-          } },
-        ],
-        { cancelable: false }
-      );
+      // Alert.alert(
+      //   'QR Code Scanned', 
+      //   data, 
+      //   [
+      //     { text: 'OK', onPress: () => {
+      //       setScanned(false)
+      //       router.push({ pathname: '/(screens)/StudentMarkAttendaceV2', params: { qrData: data } })
+      //     } },
+      //   ],
+      //   { cancelable: false }
+      // );
+      console.log("QR Code Scanned: ", data);
+      setScanned(false)
+      router.push({ pathname: '/(screens)/StudentMarkAttendace', params: { qrData: data } })
     }
   }
 
@@ -66,7 +69,7 @@ export default function StudentScanner() {
           Scan the QR code shown by the teacher
         </Text>
       </View>
-      
+
       <CameraView
         style={styles.camera}
         facing={facing}
@@ -75,16 +78,16 @@ export default function StudentScanner() {
         <View style={styles.scanOverlay}>
           <View style={styles.scanFrame} />
         </View>
-        
+
         <View style={styles.buttonContainer}>
-          <TouchableOpacity 
-            style={styles.flipButton} 
+          <TouchableOpacity
+            style={styles.flipButton}
             onPress={toggleCameraFacing}
           >
             <Text style={styles.buttonText}>Flip Camera</Text>
           </TouchableOpacity>
         </View>
-        
+
         {scanned && (
           <View style={styles.scanAgainContainer}>
             <TouchableOpacity

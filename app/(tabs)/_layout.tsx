@@ -9,18 +9,27 @@ import {
   TrainerTabNavigator,
 } from '@/navigator/navigation';
 import { Text, View } from 'react-native';
-import { ActivityIndicator } from 'react-native-paper';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function RoleLayout() {
   useFrameworkReady();
-  const { user, loading } = useAuth();
   const router = useRouter();
+  const [loading, setLoading] = useState(true);
+  const [user, setUser]: any = useState(null);
 
   useEffect(() => {
-    if (!loading && !user) {
-      router.replace('/(auth)/Login');
+    async function checkToken() {
+      const token = await AsyncStorage.getItem('user');
+      if (!token) {
+        router.replace('/(auth)/Login');
+      } else {
+        const parsedToken = JSON.parse(token);
+        setUser(parsedToken);
+        setLoading(false);
+      }
     }
-  }, [loading, user]);
+    checkToken();
+  }, []);
 
   if (loading) {
     return (
@@ -34,7 +43,7 @@ export default function RoleLayout() {
     <View style={{ flex: 1 }}>
       <StatusBar style="auto" />
       {(() => {
-        switch (user?.role) {
+        switch (user.role) {
           case 'learner':
             return <LearnerTabNavigator />;
           case 'admin':
