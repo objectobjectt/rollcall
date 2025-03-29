@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Image } from 'react-native';
 import {
   TextInput,
   Button,
@@ -175,20 +175,12 @@ export default function LoginScreen() {
   const [error, setError] = useState<string | null>(null);
   const [role, setRole] = useState<Role>('learner');
   const { signIn } = useAuth();
-  const router = useRouter();
-
-  //   const dispatch = useDispatch();
-  //   const authService = AuthService.getInstance();
 
   const handleLogin = async () => {
     try {
       setLoading(true);
       setError(null);
-
-      console.log(email, password, role);
       await signIn(email, password, role);
-
-      router.push('/(tabs)');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -264,12 +256,6 @@ export default function LoginScreen() {
           {/* </Link> */}
         </View>
       </View>
-
-      <View style={styles.footer}>
-        <Text variant="bodySmall" style={styles.hint}>
-          Test credentials: test@example.com / password
-        </Text>
-      </View>
     </View>
   );
 }
@@ -292,6 +278,7 @@ const styles = StyleSheet.create({
   subtitle: {
     color: '#666',
     marginTop: 8,
+    marginBottom: 18,
   },
   form: {
     flex: 1,
@@ -313,7 +300,7 @@ const styles = StyleSheet.create({
   links: {
     marginTop: 20,
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center'
   },
   footer: {
     alignItems: 'center',
