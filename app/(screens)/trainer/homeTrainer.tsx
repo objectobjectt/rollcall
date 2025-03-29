@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, FlatList, Modal, ActivityIndicator, SafeAreaView, StatusBar } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { Api } from '@/constants/ApiConstants';
+import { useAuth } from '@/hooks/useAuth';
 
 // Dummy data for assigned courses
 const dummyCourses = [
@@ -45,12 +47,37 @@ const dummyLearners = {
 };
 
 const HomeTrainer = () => {
+  const { user } = useAuth();
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [courseModalVisible, setCourseModalVisible] = useState(false);
   const [sessionStarted, setSessionStarted] = useState(false);
   const [learners, setLearners] = useState([]);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [courses, setCourses] = useState([]);
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      const response = await Api.get(Api.TRAINER_COURSES);
+      const courses = response.responseJson.courses;
+      if (!courses) return;
+      let newCourses = [];
+      for (let i = 0; i < courses.length; i++) {
+        let course = courses[i];
+        let newCourse = {
+          id: course.id,
+          name: course.name,
+          level: 'Level 1',
+          students: course.learners.length,
+          nextSession: "",
+          learners: course.learners,
+        };
+        newCourses.push(newCourse);
+      }
+      setCourses(newCourses);
+    }
+    fetchCourses();
+  }, []);
 
   const handleSelectCourse = (course) => {
     setSelectedCourse(course);
@@ -65,25 +92,25 @@ const HomeTrainer = () => {
 
   const fetchLearners = () => {
     setLoading(true);
-    
+
     // Simulate API call to get learners who are marked present
     setTimeout(() => {
       console.log("Request sent: Fetching learners for course", selectedCourse.id);
-      
+
       // Simulate backend response by randomly marking some learners as present
-      const updatedLearners = dummyLearners[selectedCourse.id].map(learner => ({
-        ...learner,
-        isPresent: Math.random() > 0.3 // Randomly mark ~70% as present
-      }));
-      
-      setLearners(updatedLearners);
+      // const updatedLearners = dummyLearners[selectedCourse.id].map(learner => ({
+      //   ...learner,
+      //   isPresent: Math.random() > 0.3 // Randomly mark ~70% as present
+      // }));
+
+      // setLearners(updatedLearners);
       setLoading(false);
-      
+
       // Set up polling for real-time updates
       startPolling();
     }, 1000);
   };
-  
+
   const startPolling = () => {
     // Poll for updates every 3 seconds
     const pollingInterval = setInterval(() => {
@@ -91,14 +118,14 @@ const HomeTrainer = () => {
         clearInterval(pollingInterval);
         return;
       }
-      
+
       setRefreshing(true);
       console.log("Request sent: Polling for attendance updates");
-      
+
       // Simulate backend response with updated attendance
       setTimeout(() => {
         const updatedLearners = [...learners];
-        
+
         // Randomly update 1-2 learners' attendance status
         const numUpdates = Math.floor(Math.random() * 2) + 1;
         for (let i = 0; i < numUpdates; i++) {
@@ -111,12 +138,12 @@ const HomeTrainer = () => {
             };
           }
         }
-        
+
         setLearners(updatedLearners);
         setRefreshing(false);
       }, 500);
     }, 3000);
-    
+
     // Cleanup interval on component unmount
     return () => clearInterval(pollingInterval);
   };
@@ -127,31 +154,27 @@ const HomeTrainer = () => {
   };
 
   const renderCourseCard = ({ item }) => (
-    <TouchableOpacity 
+    <TouchableOpacity
       style={styles.courseCard}
       onPress={() => handleSelectCourse(item)}
     >
       <View style={styles.courseHeader}>
-        <Text style={styles.courseTitle}>{item.title}</Text>
+        <Text style={styles.courseTitle}>{item.name}</Text>
         <View style={styles.levelBadge}>
           <Text style={styles.levelText}>{item.level}</Text>
         </View>
       </View>
-      
+
       <View style={styles.courseDetails}>
         <View style={styles.courseDetail}>
           <Ionicons name="people" size={18} color="#1E90FF" />
           <Text style={styles.detailText}>{item.students} Learners</Text>
         </View>
-        <View style={styles.courseDetail}>
-          <Ionicons name="time" size={18} color="#1E90FF" />
-          <Text style={styles.detailText}>{item.nextSession}</Text>
-        </View>
       </View>
-      
+
       <View style={styles.cardFooter}>
-        <TouchableOpacity 
-          style={styles.viewButton} 
+        <TouchableOpacity
+          style={styles.viewButton}
           onPress={() => handleSelectCourse(item)}
         >
           <Text style={styles.viewButtonText}>View Course</Text>
@@ -168,7 +191,7 @@ const HomeTrainer = () => {
         <Text style={styles.learnerName}>{item.name}</Text>
       </View>
       <View style={[
-        styles.statusIndicator, 
+        styles.statusIndicator,
         item.isPresent ? styles.presentIndicator : styles.absentIndicator
       ]}>
         <Text style={styles.statusText}>{item.isPresent ? 'Present' : 'Absent'}</Text>
@@ -188,39 +211,43 @@ const HomeTrainer = () => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#0052CC" />
-      
+
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>ADD USER NAME FROM AUTH</Text>
+        <Text style={styles.headerTitle}>{user?.name}</Text>
         <Text style={styles.headerSubtitle}>Your Dashboard</Text>
       </View>
-      
+
       <View style={styles.statsContainer}>
         <View style={styles.statCard}>
-          <Text style={styles.statNumber}>4</Text>
+          <Text style={styles.statNumber}>{courses.length}</Text>
           <Text style={styles.statLabel}>Active Courses</Text>
         </View>
         <View style={styles.statCard}>
-          <Text style={styles.statNumber}>65</Text>
+          <Text style={styles.statNumber}>{
+            courses.map(course => course.learners).reduce((total, students) => total + students, 0) || 0
+            }</Text>
           <Text style={styles.statLabel}>Total Learners</Text>
         </View>
         <View style={styles.statCard}>
-          <Text style={styles.statNumber}>12</Text>
+          <Text style={styles.statNumber}>{
+            Math.floor(Math.random() * 4) + 1
+            }</Text>
           <Text style={styles.statLabel}>Sessions This Week</Text>
         </View>
       </View>
-      
+
       <View style={styles.sectionHeader}>
         <Text style={styles.sectionTitle}>Your Assigned Courses</Text>
       </View>
-      
+
       <FlatList
-        data={dummyCourses}
+        data={courses}
         renderItem={renderCourseCard}
         keyExtractor={item => item.id}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.coursesList}
       />
-      
+
       <Modal
         animationType="slide"
         transparent={true}
@@ -230,12 +257,12 @@ const HomeTrainer = () => {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>{selectedCourse?.title}</Text>
+              <Text style={styles.modalTitle}>{selectedCourse?.name}</Text>
               <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
                 <Ionicons name="close" size={24} color="#0052CC" />
               </TouchableOpacity>
             </View>
-            
+
             {!sessionStarted ? (
               <View style={styles.courseDetailContainer}>
                 <View style={styles.courseDetailItem}>
@@ -246,19 +273,15 @@ const HomeTrainer = () => {
                   <Text style={styles.detailLabel}>Students:</Text>
                   <Text style={styles.detailValue}>{selectedCourse?.students} Learners</Text>
                 </View>
-                <View style={styles.courseDetailItem}>
-                  <Text style={styles.detailLabel}>Next Session:</Text>
-                  <Text style={styles.detailValue}>{selectedCourse?.nextSession}</Text>
-                </View>
-                
-                <TouchableOpacity 
+
+                <TouchableOpacity
                   style={styles.startSessionButton}
                   onPress={startSession}
                 >
                   <Ionicons name="play-circle" size={20} color="#fff" style={styles.buttonIcon} />
                   <Text style={styles.startSessionButtonText}>Start Session</Text>
                 </TouchableOpacity>
-                
+
                 <Text style={styles.instructionText}>
                   Start a session to view real-time attendance from the backend.
                 </Text>
@@ -270,7 +293,7 @@ const HomeTrainer = () => {
                     <Text style={styles.sessionTitle}>Live Session</Text>
                     <Text style={styles.sessionSubtitle}>{new Date().toLocaleTimeString()}</Text>
                   </View>
-                  
+
                   <View style={styles.attendanceSummary}>
                     <View style={styles.attendanceCount}>
                       <Text style={styles.attendanceNumber}>{getPresentCount()}/{learners.length}</Text>
@@ -282,7 +305,7 @@ const HomeTrainer = () => {
                     </View>
                   </View>
                 </View>
-                
+
                 {loading ? (
                   <View style={styles.loadingContainer}>
                     <ActivityIndicator size="large" color="#0052CC" />
@@ -299,7 +322,7 @@ const HomeTrainer = () => {
                         </View>
                       )}
                     </View>
-                    
+
                     <FlatList
                       data={learners}
                       renderItem={renderLearnerItem}
@@ -338,6 +361,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#B3D1FF',
     marginTop: 4,
+    marginBottom: 8,
   },
   statsContainer: {
     flexDirection: 'row',
