@@ -1,9 +1,10 @@
+import { Api } from '@/constants/ApiConstants';
 import React, { useState, useEffect } from 'react';
-import { 
-  StyleSheet, 
-  View, 
-  Text, 
-  TouchableOpacity, 
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
   SafeAreaView,
   ActivityIndicator,
   StatusBar
@@ -20,43 +21,44 @@ const QRgenerator = () => {
   const fetchQRData = async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
-      // TODO: Replace with actual API call to your backend
-      // For example:
-      // const response = await fetch('https://your-api.com/qr-data');
-      // const data = await response.json();
-      // setQrData(data.qrContent);
-      
-      // Simulating API call with timeout
-      setTimeout(() => {
-        setQrData('0:0:0:0'); // This would be replaced with actual data from backend
-        setLoading(false);
-      }, 1000);
+
+      // Simulated API call to fetch QR code data
+      let data = await Api.get(Api.TRAINER_QR_CODE);
+      if (data.status !== 200) {
+        throw new Error('Failed to fetch QR data');
+      }
+      const qrData = data.responseJson.qrCodeData;
+      console.log("QR Data: ", qrData);
+      setQrData(qrData);
+      setLoading(false);
+
     } catch (err) {
-      setError('Failed to fetch QR data. Please try again.');
       setLoading(false);
     }
   };
 
   // Initial data fetch on component mount
   useEffect(() => {
-    fetchQRData();
+    setLoading(false);
+    setInterval(fetchQRData, 8000)
   }, []);
 
   // Function to refresh QR code data
   const refreshQRCode = () => {
     fetchQRData();
+    setLoading(false);
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar backgroundColor="#1a5fb4" barStyle="light-content" />
-      
+
       <View style={styles.header}>
         <Text style={styles.title}>QR Code Generator</Text>
       </View>
-      
+
       <View style={styles.qrContainer}>
         {loading ? (
           <ActivityIndicator size="large" color="#1a5fb4" />
@@ -66,21 +68,15 @@ const QRgenerator = () => {
           <>
             <QRCode
               value={qrData}
-              size={200}
+              size={300}
               backgroundColor="white"
               color="#1a5fb4"
             />
-            {/* <Text style={styles.dataText}>
-              Data: {qrData}
-            </Text>
-            <Text style={styles.infoText}>
-              This QR code contains data fetched from backend.
-            </Text> */}
           </>
         )}
       </View>
-      
-      <TouchableOpacity 
+
+      <TouchableOpacity
         style={styles.refreshButton}
         onPress={refreshQRCode}
         disabled={loading}

@@ -13,6 +13,7 @@ import { Camera } from 'expo-camera';
 import * as Location from 'expo-location';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Button, Card } from 'react-native-paper';
+import { Api } from '@/constants/ApiConstants';
 
 const PermissionScreen = ({ onRequestPermissions }) => {
   return (
@@ -40,58 +41,57 @@ const PermissionScreen = ({ onRequestPermissions }) => {
 };
 
 export default function StudentScanner() {
-    const [hasPermissions, setHasPermissions] = useState(false);
- 
-    const onRequestPermissions = async () => {
-        const [cameraStatus, locationStatus] = await Promise.all([
-          Camera.requestCameraPermissionsAsync(),
-          Location.requestForegroundPermissionsAsync(),
-        ]);
-  
-        setHasPermissions(
-          cameraStatus.status === 'granted' && locationStatus.status === 'granted'
-        );
-        console.log("Camera Status: ", cameraStatus.status);
-        console.log("Location Status: ", locationStatus.status);
-        
-    };
+  const [hasPermissions, setHasPermissions] = useState(false);
 
-    useEffect(() => {
-      onRequestPermissions();
-    }, []);
-  
-    if (!hasPermissions) {
-      return <PermissionScreen onRequestPermissions={onRequestPermissions} />;
-    }
+  const onRequestPermissions = async () => {
+    const [cameraStatus, locationStatus] = await Promise.all([
+      Camera.requestCameraPermissionsAsync(),
+      Location.requestForegroundPermissionsAsync(),
+    ]);
 
-    return <StudentScannerIntenal />
+    setHasPermissions(
+      cameraStatus.status === 'granted' && locationStatus.status === 'granted'
+    );
+    console.log("Camera Status: ", cameraStatus.status);
+    console.log("Location Status: ", locationStatus.status);
+
+  };
+
+  useEffect(() => {
+    onRequestPermissions();
+  }, []);
+
+  if (!hasPermissions) {
+    return <PermissionScreen onRequestPermissions={onRequestPermissions} />;
   }
+
+  return <StudentScannerIntenal />
+}
 
 function StudentScannerIntenal() {
   const [facing, setFacing] = useState<CameraType>('back');
   const [scanned, setScanned] = useState(false);
   const router = useRouter();
-  
+
   function toggleCameraFacing() {
     setFacing((current) => (current === 'back' ? 'front' : 'back'));
   }
 
-  function handleBarCodeScanned({ data }: { data: string }) {
+  async function handleBarCodeScanned({ data }: { data: string }) {
     if (!scanned) {
       setScanned(true);
-      // Process the scanned data
-      // Alert.alert(
-      //   'QR Code Scanned', 
-      //   data, 
-      //   [
-      //     { text: 'OK', onPress: () => {
-      //       setScanned(false)
-      //       router.push({ pathname: '/(screens)/StudentMarkAttendaceV2', params: { qrData: data } })
-      //     } },
-      //   ],
-      //   { cancelable: false }
-      // );
-      console.log("QR Code Scanned: ", data);
+      let resp = await Api.post(Api.LEARNER_VALIDATE_QR, { qrCode: data });
+      if (resp.status !== 200) {
+        if (resp.responseJson.message === "Attendance already recorded") {
+          Alert.alert("verification already done", resp.responseJson.message);
+          router.push('/profile')
+        }
+        Alert.alert("verification failed", resp.responseJson.message);
+        return;
+      }
+
+      Alert.alert("QR Code Scanned", "QR Code verified Successfully");
+      console.log("QR Code Scanned:", data);
       setScanned(false)
       router.push({ pathname: '/(screens)/StudentMarkAttendace', params: { qrData: data } })
     }

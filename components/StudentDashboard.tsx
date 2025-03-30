@@ -41,7 +41,7 @@ export default function StudentDashboardScreen() {
           <View>
             <TouchableOpacity >
               <Text variant="headlineMedium" style={styles.greeting}>
-                Welcome back, {user.name}!
+                Welcome back, {user ? user.name : "user"}
               </Text>
             </TouchableOpacity>
             <Text variant="bodyLarge" style={styles.role}>
