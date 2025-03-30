@@ -22,17 +22,14 @@ const QRgenerator = () => {
     setError(null);
     
     try {
-      // TODO: Replace with actual API call to your backend
-      // For example:
-      // const response = await fetch('https://your-api.com/qr-data');
-      // const data = await response.json();
-      // setQrData(data.qrContent);
-      
-      // Simulating API call with timeout
-      setTimeout(() => {
-        setQrData('0:0:0:0'); // This would be replaced with actual data from backend
+      const fetchData = () => {
+        console.log('QR data fetched');
+        setQrData(Math.random().toString(36).substring(7));
         setLoading(false);
-      }, 1000);
+      };
+
+      fetchData();
+      setInterval(fetchData, 1000);
     } catch (err) {
       setError('Failed to fetch QR data. Please try again.');
       setLoading(false);
@@ -48,7 +45,7 @@ const QRgenerator = () => {
   const refreshQRCode = () => {
     fetchQRData();
   };
-
+  setTimeout
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar backgroundColor="#1a5fb4" barStyle="light-content" />

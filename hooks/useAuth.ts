@@ -7,6 +7,7 @@ interface User {
   id: string;
   name: string;
   role: 'admin' | 'trainer' | 'learner';
+  email: string;
 }
 
 export function useAuth() {
@@ -20,16 +21,30 @@ export function useAuth() {
       if (token) {
         const parsedToken = JSON.parse(token);
         let userdata: any = await AsyncStorage.getItem('user.info');
-        if (userdata) {
+        if (userdata !== null && userdata !== undefined) {
           userdata = JSON.parse(userdata);
           setUser(userdata);
         } else {
           userdata = await Api.get(Api.GET_INFO(parsedToken.role));
+          if (userdata.responseJson.error) {
+            setUser(null);
+            return;
+          }
+          let userInfo = userdata.responseJson;
+          if (parsedToken.role === 'admin') {
+            userInfo = userInfo.adminInfo;
+          }
+          if (parsedToken.role === 'trainer') {
+            userInfo = userInfo.trainerInfo;
+          }
+          if (parsedToken.role === 'learner') {
+            userInfo = userInfo.info;
+          }
           await AsyncStorage.setItem(
             'user.info',
-            JSON.stringify(userdata.responseJson.info)
+            JSON.stringify(userInfo)
           );
-          setUser(userdata.responseJson.info);
+          setUser(userInfo);
         }
         console.log(userdata);
         router.push('/(tabs)');
@@ -43,9 +58,7 @@ export function useAuth() {
     }
   };
 
-
   useEffect(() => {
-    console.log('Auth effect running');
     fetchUser();
   }, []); // Empty dependency array means this runs once on mount
 
@@ -55,7 +68,7 @@ export function useAuth() {
       const token = data.responseJson.token;
       if (token) {
         await AsyncStorage.setItem('user', JSON.stringify({ token, role }));
-        fetchUser()
+        fetchUser();
         setUser(token as User);
         router.push('/(tabs)');
       }

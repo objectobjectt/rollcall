@@ -8,10 +8,11 @@ import {
   TextInput,
   FlatList,
 } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import { Api } from '@/constants/ApiConstants';
 
 type User = {
   id: string;
@@ -79,6 +80,26 @@ const HomeAdmin = () => {
     },
   ]);
   const router = useRouter();
+  const [learners, setLearners] = useState([]);
+  const [trainers, setTrainers] = useState([]);
+  const [admins, setAdmins] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const learners = await Api.get(Api.ADMIN_GET_LEARNERS);
+      if (learners.responseJson) setLearners(learners.responseJson);
+      const trainers = await Api.get(Api.ADMIN_GET_TRAINERS);
+      if (trainers.responseJson) setTrainers(trainers.responseJson);
+
+      // SUPER ADMIN ONLY
+      // const admins = await Api.get(Api.ADMIN_GET_ADMINS);
+      // if (admins.responseJson) setAdmins(admins.responseJson);
+
+      console.log(learners, trainers, admins);
+      
+    }
+    fetchData();
+  }, [users]);
 
   const toggleCard = (cardName: string): void => {
     setExpandedCard(expandedCard === cardName ? null : cardName);
@@ -89,15 +110,15 @@ const HomeAdmin = () => {
       users.map((user) =>
         user.id === userId
           ? {
-              ...user,
-              status: user.status === 'active' ? 'inactive' : 'active',
-            }
+            ...user,
+            status: user.status === 'active' ? 'inactive' : 'active',
+          }
           : user
       )
     );
   };
 
-  const handleAddUser = () => {
+  const handleAddUser = async () => {
     if (newUser.name && newUser.email) {
       const user: User = {
         id: Math.random().toString(36).substring(7),
@@ -106,8 +127,20 @@ const HomeAdmin = () => {
         role: newUser.role,
         status: 'active',
       };
+      let url = Api.ADMIN_REGISTER_LEARNER;
+      if (newUser.role === 'trainer') {
+        url = Api.ADMIN_REGISTER_TRAINER;
+      }
+      if (newUser.role === 'admin') {
+        throw new Error('Admin cannot be added by another admin');
+      }
+      const response = await Api.post(url, user);
+      console.log(response);
+      
+      if (!response.responseJson) return
+
       setUsers([...users, user]);
-      setNewUser({ name: '', email: '', role: 'learner' });
+      setNewUser({ name: newUser.name, email: newUser.email, role: newUser.role });
       setShowAddUserForm(false);
       setStats({
         ...stats,
@@ -302,7 +335,7 @@ const HomeAdmin = () => {
                         style={[
                           styles.roleButtonText,
                           newUser.role === 'admin' &&
-                            styles.roleButtonTextActive,
+                          styles.roleButtonTextActive,
                         ]}
                       >
                         Admin
@@ -321,7 +354,7 @@ const HomeAdmin = () => {
                         style={[
                           styles.roleButtonText,
                           newUser.role === 'trainer' &&
-                            styles.roleButtonTextActive,
+                          styles.roleButtonTextActive,
                         ]}
                       >
                         Trainer
@@ -340,7 +373,7 @@ const HomeAdmin = () => {
                         style={[
                           styles.roleButtonText,
                           newUser.role === 'learner' &&
-                            styles.roleButtonTextActive,
+                          styles.roleButtonTextActive,
                         ]}
                       >
                         Learner
@@ -422,6 +455,46 @@ const HomeAdmin = () => {
               </TouchableOpacity>
             </View>
           )}
+        </View>
+
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Learners</Text>
+          <FlatList
+            data={learners}
+            renderItem={({ item }) => (
+              <View>
+                <Text>{item.name}</Text>
+              </View>
+            )}
+            keyExtractor={(item) => item.id}
+          />
+        </View>
+
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Trainers</Text>
+          <FlatList
+            data={trainers}
+            renderItem={({ item }) => (
+              <View>
+                <Text>{item.name}</Text>
+              </View>
+            )}
+            keyExtractor={(item) => item.id}
+          />
+        </View>
+
+
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Admins</Text>
+          <FlatList
+            data={admins}
+            renderItem={({ item }) => (
+              <View>
+                <Text>{item.name}</Text>
+              </View>
+            )}
+            keyExtractor={(item) => item.id}
+          />
         </View>
 
         <View style={styles.footer}>

@@ -28,11 +28,10 @@ const MyProfile = () => {
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={styles.profileContainer}>
           <View style={styles.avatarContainer}>
-            {/* <Image 
-              source={{ uri: user?.avatar || 'https://via.placeholder.com/100' }} 
+            <Image 
+              source={{ uri: 'https://picsum.photos/200' }} 
               style={styles.avatar}
-              defaultSource={require('@/assets/default-avatar.png')}
-            /> */}
+            />
             <TouchableOpacity style={styles.editAvatarButton}>
               <Ionicons name="camera" size={20} color="white" />
             </TouchableOpacity>
