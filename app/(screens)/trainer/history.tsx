@@ -1,130 +1,120 @@
-import React, { useState, useCallback } from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView } from 'react-native';
+import React, { useState, useCallback, useEffect } from 'react';
+import { View, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView, ActivityIndicator } from 'react-native';
 import { Text, Card, Chip, Button, Avatar, Modal, Portal, List, Provider, Divider, Searchbar } from 'react-native-paper';
 import { useFocusEffect } from '@react-navigation/native';
 import { useAuth } from '@/hooks/useAuth';
+import { Api } from '@/constants/ApiConstants';
 
-// Sample data with learner information
-const mockClassHistory = [
-  {
-    id: '1',
-    date: '2024-03-25',
-    subject: 'Advanced JavaScript',
-    duration: '1h 30m',
-    learners: [
-      { id: 'l1', name: 'Alex Johnson', status: 'present' },
-      { id: 'l2', name: 'Maria Garcia', status: 'present' },
-      { id: 'l3', name: 'James Wilson', status: 'present' },
-      { id: 'l4', name: 'Emily Chen', status: 'absent' },
-      { id: 'l5', name: 'Michael Brown', status: 'present' },
-    ],
-    feedback: {
-      rating: 4.7,
-      count: 4
+// This would come from your API in production
+const mockModuleData = {
+  "id": "babf8013-4d75-42ab-a0b2-e1f099d195ad",
+  "name": "testing module",
+  "level": "Level 1",
+  "sessions": [
+    {
+      "id": "b4de38c6-b5dd-4af5-ae1b-b333cfb5dcc3",
+      "isActive": false,
+      "createdAt": "2025-03-30T00:12:34.269Z",
+      "attendences": [
+        {
+          "id": "1e34f668-f16f-4a43-8607-5d9dd0b67332",
+          "studentId": "a3c585a6-2066-4701-b9a9-41ef87a399ed",
+          "student": {
+            "id": "a3c585a6-2066-4701-b9a9-41ef87a399ed",
+            "name": "abc",
+            "email": "abc@example.com"
+          }
+        }
+      ]
+    },
+    {
+      "id": "4d092733-d23f-49b9-b5cc-249dd6532868",
+      "isActive": false,
+      "createdAt": "2025-03-30T06:25:29.934Z",
+      "attendences": []
+    },
+    {
+      "id": "02e6a3ba-8bb8-465b-b7e0-6a5dfc01f14f",
+      "isActive": false,
+      "createdAt": "2025-03-30T06:25:34.598Z",
+      "attendences": []
     }
-  },
-  {
-    id: '2',
-    date: '2024-03-23',
-    subject: 'React Native Basics',
-    duration: '2h 15m',
-    learners: [
-      { id: 'l1', name: 'Alex Johnson', status: 'present' },
-      { id: 'l2', name: 'Maria Garcia', status: 'absent' },
-      { id: 'l3', name: 'James Wilson', status: 'present' },
-      { id: 'l6', name: 'Sarah Lee', status: 'present' },
-      { id: 'l7', name: 'David Kim', status: 'present' },
-      { id: 'l8', name: 'Jessica Patel', status: 'absent' },
-    ],
-    feedback: {
-      rating: 4.5,
-      count: 4
+  ],
+  "students": 1,
+  "nextSession": "",
+  "learners": [
+    {
+      "learner": {
+        "id": "a3c585a6-2066-4701-b9a9-41ef87a399ed",
+        "name": "abc",
+        "email": "abc@example.com"
+      }
     }
-  },
-  {
-    id: '3',
-    date: '2024-03-20',
-    subject: 'Database Design',
-    duration: '1h 45m',
-    learners: [
-      { id: 'l2', name: 'Maria Garcia', status: 'present' },
-      { id: 'l3', name: 'James Wilson', status: 'present' },
-      { id: 'l8', name: 'Jessica Patel', status: 'present' },
-      { id: 'l9', name: 'Robert Taylor', status: 'absent' },
-      { id: 'l10', name: 'Emma Rodriguez', status: 'present' },
-    ],
-    feedback: {
-      rating: 4.8,
-      count: 4
-    }
-  },
-  {
-    id: '4',
-    date: '2024-03-18',
-    subject: 'UI/UX Design Principles',
-    duration: '2h 00m',
-    learners: [
-      { id: 'l1', name: 'Alex Johnson', status: 'present' },
-      { id: 'l4', name: 'Emily Chen', status: 'present' },
-      { id: 'l7', name: 'David Kim', status: 'present' },
-      { id: 'l11', name: 'Sophia Wang', status: 'absent' },
-      { id: 'l12', name: 'Noah Martinez', status: 'present' },
-    ],
-    feedback: {
-      rating: 4.9,
-      count: 4
-    }
-  },
-  {
-    id: '5',
-    date: '2024-03-15',
-    subject: 'Cloud Computing',
-    duration: '1h 30m',
-    learners: [
-      { id: 'l3', name: 'James Wilson', status: 'absent' },
-      { id: 'l5', name: 'Michael Brown', status: 'present' },
-      { id: 'l9', name: 'Robert Taylor', status: 'present' },
-      { id: 'l13', name: 'Olivia Adams', status: 'present' },
-      { id: 'l14', name: 'William Singh', status: 'absent' },
-    ],
-    feedback: {
-      rating: 4.3,
-      count: 3
-    }
-  },
-];
+  ]
+};
 
-export default function TrainerHistoryScreen() {
-  const { signOut, user } = useAuth()
-  const [selectedClass, setSelectedClass] = useState(null);
+export default function SessionAttendanceHistoryScreen() {
+  const { signOut, user } = useAuth();
+  const [selectedSession, setSelectedSession] = useState(null);
   const [visible, setVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredHistory, setFilteredHistory] = useState(mockClassHistory);
+  const [filteredSessions, setFilteredSessions] = useState(mockModuleData.sessions);
   const [loading, setLoading] = useState(false);
-  
-  // Filter classes based on search query
+  const [data, setData] = useState(null);
+  const [loadingData, setLoadingData] = useState(true);
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      const response = await Api.get(Api.TRAINER_COURSES);
+      const courses = response.responseJson.courses;
+      if (!courses) return;
+      let newCourses = [];
+      for (let i = 0; i < courses.length; i++) {
+        let course = courses[i];
+        let newCourse = {
+          id: course.id,
+          name: course.name,
+          level: 'Level 1',
+          sessions: course.sessions,
+          students: course.learners.length,
+          nextSession: "",
+          learners: course.learners,
+        };
+        newCourses.push(newCourse);
+      }
+      setData(newCourses || mockModuleData);
+      setLoadingData(false);
+    }
+
+    fetchCourses();
+  }, []);
+
+
+
+  // Filter sessions based on search query
   useFocusEffect(
     useCallback(() => {
       if (searchQuery.trim() === '') {
-        setFilteredHistory(mockClassHistory);
+        setFilteredSessions(mockModuleData.sessions);
         return;
       }
-      
+
       const lowerCaseQuery = searchQuery.toLowerCase();
-      const filtered = mockClassHistory.filter(
-        record => record.subject.toLowerCase().includes(lowerCaseQuery) || 
-                  record.date.includes(lowerCaseQuery)
-      );
-      setFilteredHistory(filtered);
+      const filtered = mockModuleData.sessions.filter(session => {
+        const sessionDate = new Date(session.createdAt).toLocaleDateString();
+        return sessionDate.toLowerCase().includes(lowerCaseQuery);
+      });
+
+      setFilteredSessions(filtered);
     }, [searchQuery])
   );
 
   const onChangeSearch = query => {
     setSearchQuery(query);
   };
-  
-  const showClassDetails = (classRecord) => {
-    setSelectedClass(classRecord);
+
+  const showSessionDetails = (session) => {
+    setSelectedSession(session);
     setVisible(true);
   };
 
@@ -134,22 +124,27 @@ export default function TrainerHistoryScreen() {
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      weekday: 'short', 
-      month: 'short', 
-      day: 'numeric'
+    return date.toLocaleDateString('en-US', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
     });
   };
 
-  const renderClassCard = (record) => {
-    const presentCount = record.learners.filter(l => l.status === 'present').length;
-    const totalCount = record.learners.length;
-    const attendancePercentage = Math.round((presentCount / totalCount) * 100);
-    
-    // Improved color scheme with more professional blues
+  const renderSessionCard = (session, index) => {
+    const sessionNumber = index + 1;
+    const attendanceCount = session.attendences.length;
+    const totalLearners = mockModuleData.learners.length;
+    const attendancePercentage = totalLearners > 0
+      ? Math.round((attendanceCount / totalLearners) * 100)
+      : 0;
+
+    // Color scheme with professional blues
     let statusColor = '#2196F3'; // Standard blue
     let statusText = 'Good';
-    
+
     if (attendancePercentage < 80) {
       statusColor = '#1976D2'; // Darker blue
       statusText = 'Average';
@@ -158,48 +153,57 @@ export default function TrainerHistoryScreen() {
       statusColor = '#0D47A1'; // Deep blue
       statusText = 'Low';
     }
-    
+    if (loadingData) {
+      return (
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+          <ActivityIndicator size="large" color="#0052CC" />
+          <Text style={{ fontSize: 16, color: '#0052CC', marginTop: 12 }}>Loading...</Text>
+        </View>
+      );
+    }
+
     return (
-      <TouchableOpacity 
-        key={record.id} 
-        onPress={() => showClassDetails(record)}
+      <TouchableOpacity
+        key={session.id}
+        onPress={() => showSessionDetails(session)}
         activeOpacity={0.7}
       >
-        <Card style={styles.classCard}>
+        <Card style={styles.sessionCard}>
           <Card.Content>
             <View style={styles.cardHeader}>
               <View style={styles.titleContainer}>
-                <Text style={styles.subjectTitle}>{record.subject}</Text>
+                <Text style={styles.subjectTitle}>Session {sessionNumber}</Text>
                 <Text style={styles.dateText}>
-                  {formatDate(record.date)} • {record.duration}
+                  {formatDate(session.createdAt)}
                 </Text>
               </View>
-              <Chip 
-                style={[styles.statusChip, { backgroundColor: statusColor }]} 
+              <Chip
+                style={[styles.statusChip, { backgroundColor: statusColor }]}
                 textStyle={{ color: 'white', fontWeight: '600' }}
               >
                 {statusText} {attendancePercentage}%
               </Chip>
             </View>
-            
+
             <Divider style={styles.divider} />
-            
+
             <View style={styles.statsContainer}>
               <View style={styles.statItem}>
-                <Text style={styles.statValue}>{totalCount}</Text>
+                <Text style={styles.statValue}>{totalLearners}</Text>
                 <Text style={styles.statLabel}>Total</Text>
               </View>
               <View style={styles.statItem}>
-                <Text style={[styles.statValue, { color: '#4CAF50' }]}>{presentCount}</Text>
+                <Text style={[styles.statValue, { color: '#4CAF50' }]}>{attendanceCount}</Text>
                 <Text style={styles.statLabel}>Present</Text>
               </View>
               <View style={styles.statItem}>
-                <Text style={[styles.statValue, { color: '#E57373' }]}>{totalCount - presentCount}</Text>
+                <Text style={[styles.statValue, { color: '#E57373' }]}>{totalLearners - attendanceCount}</Text>
                 <Text style={styles.statLabel}>Absent</Text>
               </View>
-              <View style={styles.ratingContainer}>
-                <Text style={styles.ratingValue}>★ {record.feedback.rating.toFixed(1)}</Text>
-                <Text style={styles.ratingCount}>({record.feedback.count})</Text>
+              <View style={styles.statusContainer}>
+                <Text style={styles.statusValue}>
+                  {session.isActive ? 'Active' : 'Completed'}
+                </Text>
               </View>
             </View>
           </Card.Content>
@@ -210,9 +214,9 @@ export default function TrainerHistoryScreen() {
 
   const renderEmptyState = () => (
     <View style={styles.emptyState}>
-      <Text style={styles.emptyStateText}>No classes found matching your search.</Text>
-      <Button 
-        mode="outlined" 
+      <Text style={styles.emptyStateText}>No sessions found matching your search.</Text>
+      <Button
+        mode="outlined"
         onPress={() => setSearchQuery('')}
         style={styles.emptyStateButton}
       >
@@ -221,119 +225,124 @@ export default function TrainerHistoryScreen() {
     </View>
   );
 
+  // Generate list of all students with attendance status for a specific session
+  const generateAttendanceList = (session) => {
+    // Start with all learners from the module
+    return mockModuleData.learners.map(item => {
+      const learner = item.learner;
+      // Check if this learner is in the attendance list for this session
+      const attended = session.attendences.some(a => a.studentId === learner.id);
+
+      return {
+        id: learner.id,
+        name: learner.name,
+        email: learner.email,
+        status: attended ? 'present' : 'absent'
+      };
+    });
+  };
+
   return (
     <Provider>
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.container}>
           <Portal>
-            <Modal 
-              visible={visible} 
-              onDismiss={hideModal} 
+            <Modal
+              visible={visible}
+              onDismiss={hideModal}
               contentContainerStyle={styles.modalContainer}
               dismissable={true}
             >
-              {selectedClass && (
+              {selectedSession && (
                 <View>
                   <View style={styles.modalHeader}>
-                    <Text style={styles.modalTitle}>{selectedClass.subject}</Text>
-                    <Text style={styles.modalSubtitle}>
-                      {formatDate(selectedClass.date)} • {selectedClass.duration}
+                    <Text style={styles.modalTitle}>
+                      {mockModuleData.name} - Session Details
                     </Text>
+                    <Text style={styles.modalSubtitle}>
+                      {formatDate(selectedSession.createdAt)}
+                    </Text>
+                    <Chip
+                      style={[styles.moduleChip]}
+                      textStyle={styles.moduleChipText}
+                    >
+                      {mockModuleData.level}
+                    </Chip>
                   </View>
-                  
+
                   <View style={styles.attendanceSummary}>
                     <View style={styles.attendanceItem}>
-                      <Text style={styles.attendanceValue}>{selectedClass.learners.length}</Text>
+                      <Text style={styles.attendanceValue}>{mockModuleData.learners.length}</Text>
                       <Text style={styles.attendanceLabel}>Total</Text>
                     </View>
                     <View style={styles.attendanceItem}>
                       <Text style={[styles.attendanceValue, { color: '#4CAF50' }]}>
-                        {selectedClass.learners.filter(l => l.status === 'present').length}
+                        {selectedSession.attendences.length}
                       </Text>
                       <Text style={styles.attendanceLabel}>Present</Text>
                     </View>
                     <View style={styles.attendanceItem}>
                       <Text style={[styles.attendanceValue, { color: '#E57373' }]}>
-                        {selectedClass.learners.filter(l => l.status === 'absent').length}
+                        {mockModuleData.learners.length - selectedSession.attendences.length}
                       </Text>
                       <Text style={styles.attendanceLabel}>Absent</Text>
                     </View>
                   </View>
-                  
-                  <View style={styles.feedbackSummary}>
-                    <Text style={styles.feedbackTitle}>Class Rating</Text>
-                    <View style={styles.ratingDetails}>
-                      <Text style={styles.modalRating}>
-                        {selectedClass.feedback.rating.toFixed(1)}
-                      </Text>
-                      <View style={styles.starContainer}>
-                        <Text style={styles.starText}>★★★★★</Text>
-                        <Text style={styles.feedbackCount}>
-                          ({selectedClass.feedback.count} ratings)
-                        </Text>
-                      </View>
-                    </View>
-                  </View>
-                  
+
                   <Text style={styles.sectionHeader}>Attendance Details</Text>
-                  
+
                   <ScrollView style={styles.learnersList}>
-                    {selectedClass.learners.map(learner => (
+                    {generateAttendanceList(selectedSession).map(learner => (
                       <List.Item
                         key={learner.id}
                         title={learner.name}
+                        description={learner.email}
                         left={props => (
-                          <List.Icon 
-                            {...props} 
-                            icon={learner.status === 'present' ? 'check-circle' : 'close-circle'} 
-                            color={learner.status === 'present' ? '#4CAF50' : '#E57373'} 
+                          <List.Icon
+                            {...props}
+                            icon={learner.status === 'present' ? 'check-circle' : 'close-circle'}
+                            color={learner.status === 'present' ? '#4CAF50' : '#E57373'}
                           />
                         )}
                         titleStyle={styles.learnerName}
+                        descriptionStyle={styles.learnerEmail}
                         style={styles.learnerItem}
                       />
                     ))}
                   </ScrollView>
-                  
+
                   <View style={styles.buttonContainer}>
-                    <Button 
-                      mode="contained" 
-                      onPress={hideModal} 
+                    <Button
+                      mode="contained"
+                      onPress={hideModal}
                       style={styles.closeButton}
                       labelStyle={styles.buttonLabel}
                     >
                       Close
                     </Button>
-                    {/* <Button 
-                      mode="outlined" 
-                      onPress={() => {
-                        hideModal();
-                        // This would open a report view in a real app
-                        console.log('Generate report for', selectedClass.id);
-                      }} 
-                      style={styles.reportButton}
-                      labelStyle={styles.outlineButtonLabel}
-                    >
-                      
-                    </Button> */}
                   </View>
                 </View>
               )}
             </Modal>
           </Portal>
-          
+
           <View style={styles.header}>
-            <Text style={styles.headerTitle}>Class History</Text>
-            <Avatar.Icon 
-              size={42} 
-              icon="account" 
-              style={styles.avatar} 
+            <Text style={styles.headerTitle}>Session History</Text>
+            <Avatar.Icon
+              size={42}
+              icon="account"
+              style={styles.avatar}
               color="#FFFFFF"
             />
           </View>
-          
+
+          <View style={styles.moduleInfoContainer}>
+            <Text style={styles.moduleName}>{mockModuleData.name}</Text>
+            <Chip style={styles.levelChip}>{mockModuleData.level}</Chip>
+          </View>
+
           <Searchbar
-            placeholder="Search by subject or date"
+            placeholder="Search by date"
             onChangeText={onChangeSearch}
             value={searchQuery}
             style={styles.searchBar}
@@ -342,20 +351,20 @@ export default function TrainerHistoryScreen() {
             placeholderTextColor="#90A4AE"
             loading={loading}
           />
-          
+
           <Text style={styles.sectionTitle}>
-            {searchQuery ? 'Search Results' : 'Recent Classes'}
+            {searchQuery ? 'Search Results' : 'All Sessions'}
           </Text>
-          
-          <ScrollView 
+
+          <ScrollView
             style={styles.scrollContainer}
             showsVerticalScrollIndicator={false}
           >
-            {filteredHistory.length > 0 
-              ? filteredHistory.map(record => renderClassCard(record))
+            {filteredSessions.length > 0
+              ? filteredSessions.map((session, index) => renderSessionCard(session, index))
               : renderEmptyState()
             }
-            
+
             {/* Add a bit of space at the bottom for better scrolling */}
             <View style={styles.scrollPadding} />
           </ScrollView>
@@ -368,7 +377,7 @@ export default function TrainerHistoryScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    marginTop:40,
+    marginTop: 40,
     backgroundColor: '#FAFAFA',
   },
   container: {
@@ -389,6 +398,21 @@ const styles = StyleSheet.create({
   },
   avatar: {
     backgroundColor: '#1976D2',
+  },
+  moduleInfoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  moduleName: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#1565C0',
+    flex: 1,
+  },
+  levelChip: {
+    backgroundColor: '#E3F2FD',
+    marginLeft: 8,
   },
   searchBar: {
     marginBottom: 16,
@@ -411,7 +435,7 @@ const styles = StyleSheet.create({
   scrollPadding: {
     height: 20,
   },
-  classCard: {
+  sessionCard: {
     marginBottom: 12,
     borderRadius: 8,
     elevation: 2,
@@ -466,18 +490,14 @@ const styles = StyleSheet.create({
     color: '#546E7A',
     marginTop: 2,
   },
-  ratingContainer: {
+  statusContainer: {
     marginLeft: 'auto',
     alignItems: 'center',
   },
-  ratingValue: {
-    fontSize: 16,
+  statusValue: {
+    fontSize: 14,
     fontWeight: 'bold',
-    color: '#FF9800',
-  },
-  ratingCount: {
-    fontSize: 12,
-    color: '#757575',
+    color: '#1976D2',
   },
   // Modal styles
   modalContainer: {
@@ -500,6 +520,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#546E7A',
     marginTop: 4,
+    marginBottom: 8,
+  },
+  moduleChip: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#E3F2FD',
+    marginTop: 4,
+  },
+  moduleChipText: {
+    color: '#1565C0',
   },
   attendanceSummary: {
     flexDirection: 'row',
@@ -523,42 +552,6 @@ const styles = StyleSheet.create({
     color: '#546E7A',
     marginTop: 4,
   },
-  feedbackSummary: {
-    backgroundColor: '#FFF8E1',
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 16,
-    elevation: 1,
-  },
-  feedbackTitle: {
-    fontSize: 15,
-    fontWeight: 'bold',
-    color: '#F57C00',
-    marginBottom: 8,
-  },
-  ratingDetails: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  modalRating: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#FF9800',
-    marginRight: 12,
-  },
-  starContainer: {
-    flexDirection: 'column',
-  },
-  starText: {
-    fontSize: 16,
-    color: '#FF9800',
-    letterSpacing: 2,
-  },
-  feedbackCount: {
-    fontSize: 12,
-    color: '#757575',
-    marginTop: 2,
-  },
   sectionHeader: {
     fontSize: 16,
     fontWeight: 'bold',
@@ -579,32 +572,24 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#333333',
   },
+  learnerEmail: {
+    fontSize: 12,
+    color: '#757575',
+  },
   buttonContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     marginTop: 20,
   },
   closeButton: {
-    flex: 1,
-    marginRight: 8,
+    width: '100%',
     backgroundColor: '#1976D2',
     elevation: 2,
-  },
-  reportButton: {
-    flex: 1,
-    marginLeft: 8,
-    borderColor: '#1976D2',
-    elevation: 1,
   },
   buttonLabel: {
     fontSize: 14,
     fontWeight: 'bold',
     color: 'white',
-  },
-  outlineButtonLabel: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#1976D2',
   },
   emptyState: {
     alignItems: 'center',

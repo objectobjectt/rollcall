@@ -41,8 +41,9 @@ const QRgenerator = () => {
 
   // Initial data fetch on component mount
   useEffect(() => {
+    fetchQRData();
     setLoading(false);
-    setInterval(fetchQRData, 8000)
+    setInterval(fetchQRData, 5000)
   }, []);
 
   // Function to refresh QR code data

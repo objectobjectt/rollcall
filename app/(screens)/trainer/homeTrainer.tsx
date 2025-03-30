@@ -3,58 +3,19 @@ import { StyleSheet, Text, View, TouchableOpacity, FlatList, Modal, ActivityIndi
 import { Ionicons } from '@expo/vector-icons';
 import { Api } from '@/constants/ApiConstants';
 import { useAuth } from '@/hooks/useAuth';
-
-// Dummy data for assigned courses
-const dummyCourses = [
-  { id: '1', title: 'Strength & Conditioning', level: 'Advanced', students: 18, nextSession: '2:30 PM Today' },
-  { id: '2', title: 'Yoga Fundamentals', level: 'Beginner', students: 12, nextSession: '10:00 AM Tomorrow' },
-  { id: '3', title: 'HIIT Circuit Training', level: 'Intermediate', students: 15, nextSession: '4:00 PM Tomorrow' },
-  { id: '4', title: 'Nutrition & Wellness', level: 'All Levels', students: 20, nextSession: '1:00 PM Today' },
-];
-
-// Dummy learners data
-const dummyLearners = {
-  '1': [
-    { id: '1', name: 'Alex Johnson', avatar: '🧑‍🦱', isPresent: false },
-    { id: '2', name: 'Maria Garcia', avatar: '👩', isPresent: false },
-    { id: '3', name: 'James Wilson', avatar: '🧔', isPresent: false },
-    { id: '4', name: 'Emma Davis', avatar: '👱‍♀️', isPresent: false },
-    { id: '5', name: 'Liu Wei', avatar: '👨', isPresent: false },
-    { id: '6', name: 'Sofia Rodriguez', avatar: '👩‍🦱', isPresent: false },
-  ],
-  '2': [
-    { id: '1', name: 'Raj Patel', avatar: '👨‍🦰', isPresent: false },
-    { id: '2', name: 'Olivia Smith', avatar: '👩‍🦰', isPresent: false },
-    { id: '3', name: 'Daniel Kim', avatar: '🧑', isPresent: false },
-    { id: '4', name: 'Aisha Johnson', avatar: '👩‍🦱', isPresent: false },
-  ],
-  '3': [
-    { id: '1', name: 'Thomas Brown', avatar: '👨‍🦱', isPresent: false },
-    { id: '2', name: 'Mia Anderson', avatar: '👧', isPresent: false },
-    { id: '3', name: 'David Miller', avatar: '👴', isPresent: false },
-    { id: '4', name: 'Sarah Wilson', avatar: '👩‍🦳', isPresent: false },
-    { id: '5', name: 'Javier Lopez', avatar: '👨‍🦲', isPresent: false },
-  ],
-  '4': [
-    { id: '1', name: 'Emily Chen', avatar: '👩', isPresent: false },
-    { id: '2', name: 'Michael Johnson', avatar: '👨‍🦱', isPresent: false },
-    { id: '3', name: 'Zoe Williams', avatar: '👩‍🦰', isPresent: false },
-    { id: '4', name: 'Abdul Rahman', avatar: '🧔', isPresent: false },
-    { id: '5', name: 'Priya Sharma', avatar: '👩‍🦱', isPresent: false },
-    { id: '6', name: 'Leo Martinez', avatar: '👨', isPresent: false },
-    { id: '7', name: 'Hannah Berg', avatar: '👱‍♀️', isPresent: false },
-  ],
-};
+import { router } from 'expo-router';
 
 const HomeTrainer = () => {
   const { user } = useAuth();
-  const [selectedCourse, setSelectedCourse] = useState(null);
+  const [selectedCourse, setSelectedCourse]: any = useState(null);
   const [courseModalVisible, setCourseModalVisible] = useState(false);
   const [sessionStarted, setSessionStarted] = useState(false);
   const [learners, setLearners] = useState([]);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [courses, setCourses] = useState([]);
+  const [totalStudents, setTotalStudents] = useState(0);
+  const [totalSessions, setTotalSessions] = useState(0);
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -68,14 +29,22 @@ const HomeTrainer = () => {
           id: course.id,
           name: course.name,
           level: 'Level 1',
+          sessions: course.sessions,
           students: course.learners.length,
           nextSession: "",
           learners: course.learners,
         };
         newCourses.push(newCourse);
       }
+      console.log("Courses: ", newCourses);
+      const totalSessions = courses.reduce((sum, course) => sum + course.sessions.length, 0);
+      setTotalSessions(totalSessions);
+
       setCourses(newCourses);
+      const total = newCourses.reduce((sum, course) => sum + course.students, 0);
+      setTotalStudents(total);
     }
+
     fetchCourses();
   }, []);
 
@@ -86,7 +55,15 @@ const HomeTrainer = () => {
   };
 
   const startSession = () => {
+    console.log("Session started for course:", selectedCourse);
+    if (selectedCourse && selectedCourse.id) {
+      Api.post(Api.TRAINER_CREATE_SESSION, {
+        courseId: selectedCourse.id,
+      });
+      router.push('/(screens)/trainer/generateQR')
+    }
     setSessionStarted(true);
+    // TODO: api req to start session
     fetchLearners();
   };
 
@@ -223,16 +200,12 @@ const HomeTrainer = () => {
           <Text style={styles.statLabel}>Active Courses</Text>
         </View>
         <View style={styles.statCard}>
-          <Text style={styles.statNumber}>{
-            courses.map(course => course.learners).reduce((total, students) => total + students, 0) || 0
-            }</Text>
+          <Text style={styles.statNumber}>{totalStudents}</Text>
           <Text style={styles.statLabel}>Total Learners</Text>
         </View>
         <View style={styles.statCard}>
-          <Text style={styles.statNumber}>{
-            Math.floor(Math.random() * 4) + 1
-            }</Text>
-          <Text style={styles.statLabel}>Sessions This Week</Text>
+          <Text style={styles.statNumber}>{totalSessions}</Text>
+          <Text style={styles.statLabel}>Total Sessions </Text>
         </View>
       </View>
 

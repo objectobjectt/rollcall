@@ -86,7 +86,8 @@ export class Api {
   static readonly LEARNER_VALIDATE_LOCATION = `${this.BASE_URL}/api/learner/validate/location`;
   static readonly LEARNER_VALIDATE_BLUETOOTH = `${this.BASE_URL}/api/learner/validate/bluetooth`;
   static readonly LEARNER_VALIDATE_FACE = `${this.BASE_URL}/api/learner/validate/face`;
-  static readonly LEARNER_ATTENDANCE = `${this.BASE_URL}/api/learner/attendance`;
+  static readonly LEARNER_ATTENDANCE_STATS = `${this.BASE_URL}/api/learner/stats`;
+  static readonly LEARNER_ATTENDANCE = `${this.BASE_URL}/api/learner/history`;
 
 
 
